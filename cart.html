@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>АвтоМаркет — Корзина</title>
+    
+    <!-- СЛУЖЕБНЫЙ ЗАЩИТНЫЙ СКРИПТ: БЕЗОПАСНЫЙ ПЕРЕХОД И ИСПРАВЛЕНИЕ СБОЕВ СЕССИИ -->
+    <script>
+        (function() {
+            let currentRole = localStorage.getItem('am_user_role');
+            let currentUser = localStorage.getItem('am_user_name');
+
+            // Страховка сессии: если вход выполнен под Иваном, принудительно восстанавливаем ключи в память
+            if (localStorage.getItem('am_user_email') === '123456@mail.ru') {
+                if (!currentRole || currentRole === 'guest') {
+                    localStorage.setItem('am_user_role', 'client');
+                    currentRole = 'client';
+                }
+                if (!currentUser) {
+                    localStorage.setItem('am_user_name', 'Иван Иванович');
+                    localStorage.setItem('am_user_balance', '45200');
+                }
+            }
+
+            // Блокировка доступа: если сессия пустая или гостевая — жестко отправляем на форму входа
+            if (!currentRole || currentRole === 'guest') {
+                alert("Доступ заблокирован! Пожалуйста, сначала войдите в систему.");
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body style="background-color: #f8fafc; margin: 0; padding: 0;">
+
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ -->
+    <header class="main-header" style="background: none; border: none; box-shadow: none; position: relative; z-index: 100;">
+        <div class="header-top">
+            
+            <!-- ЛОГОТИП АВТОМАРКЕТ В ВЕРХНЕМ ЛЕВЫМ УГЛУ (КЛИКАБЕЛЬНЫЙ) -->
+            <a href="glavnaya.html" class="logo" style="font-size: 22px; white-space: nowrap; margin-right: 25px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span style="font-weight: 800; letter-spacing: -0.5px; color: #000000;">Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+            <!-- ВЫБОР ГОРОДА -->
+            <div class="city-select">
+                <span>Город: </span>
+                <select id="header-city-select">
+                    <option value="Москва">Москва</option>
+                    <option value="Пенза">Пенза</option>
+                    <option value="Санкт-Петербург">Санкт-Петербург</option>
+                </select>
+            </div>
+
+           <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ (УНИВЕРСАЛЬНОЕ СКВОЗНОЕ С ПРОФИЛЕМ) -->
+           <nav class="main-nav" style="margin-right: auto;">
+                <a href="glavnaya.html" class="nav-link">Главная</a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Каталоги ▾</div>
+                    <div class="dropdown-content">
+                        <a href="catalog.html">Оригинальный каталог</a>
+                        <a href="china_catalog.html">Китайский каталог</a>
+                        <a href="replacements_catalog.html">Каталог заменителей</a>
+                        <a href="tyres_catalog.html">Каталог шин и дисков</a>
+                        <a href="lamps_catalog.html">Автолампы</a>
+                        <a href="garage.html">Гараж</a>
+                    </div>
+                </div>
+
+                <!-- КОРЗИНА: Сохранен оранжевый кругляшок-счётчик количества товаров -->
+                <a href="cart.html" class="nav-link" id="nav-cart-link">Корзина <span id="cart-counter" style="background: #ea580c; color: white; padding: 2px 7px; border-radius: 20px; font-size: 12px; margin-left: 3px; display: none;">0</span></a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Заказы ▾</div>
+                    <div class="dropdown-content">
+                        <a href="orders.html?action=view">Заказы</a>
+                        <a href="returns.html">Оформление возвратов</a>
+                        <a href="claims.html">Оформление рекламаций</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Взаиморасчеты ▾</div>
+                    <div class="dropdown-content">
+                        <a href="sales.html">Продажи (Архив сделок)</a>
+                        <a href="finance.html">Финансы</a>
+                        <a href="schedule.html">График расчетов</a>
+                    </div>
+                </div>
+
+                <a href="profile.html" class="nav-link">Личные данные</a>
+                <a href="qrcode.html" class="nav-link">Оплата по QR</a>
+            </nav>
+
+            <!-- ДИНАМИЧЕСКИЙ БЛОК ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ -->
+            <div class="user-menu" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; line-height: 1.3; padding: 4px 0; font-size: 14px; white-space: nowrap;">
+                <a href="profile.html" id="nav-user-greeting" style="font-weight: 600; color: #0c56ea; text-decoration: none; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#0c56ea'">Загрузка...</a>
+                <div style="font-weight: 600; color: #000000;">
+                    Баланс: <span style="color: #16a34a;" id="nav-user-balance">0 ₽</span>
+                </div>
+                <a href="#" onclick="handleLogout(event)" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: bold; margin-top: 2px;">Выход</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container" style="width: 92%; max-width: 1400px; margin: 30px auto 0 auto; box-sizing: border-box;">
+        <h2 style="margin-bottom: 20px; font-size: 22px; font-weight: 700;">Ваша корзина закупщика</h2>
+
+        <div class="order-card" id="cart-card">
+            <!-- Если корзина пуста -->
+            <div id="empty-cart-message" style="display: none; text-align: center; padding: 40px 0; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <span style="font-size: 48px;">🛒</span>
+                <h3 style="font-size: 18px; margin: 15px 0 5px 0;">В вашей корзине пока ничего нет</h3>
+                <p style="color: #64748b; font-size: 14px;">Введите артикул запчасти в строку поиска на Главной странице, чтобы добавить её сюда.</p>
+                <a href="glavnaya.html" style="margin-top: 15px; display: inline-block; text-decoration: none; padding: 10px 20px; background: #ea580c; color: white; border-radius: 6px; font-weight: bold;">Перейти к поиску</a>
+            </div>
+
+            <!-- Таблица товаров в корзине -->
+            <div id="cart-content" class="table-responsive" style="background: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);">
+                <table class="schedule-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #e2e8f0; background: #f8fafc; color: #475569;">
+                            <th style="width: 40px; text-align: center; padding: 12px;"><input type="checkbox" id="select-all-checkbox" checked style="cursor:pointer;" onclick="toggleAllCheckboxes(this)"></th>
+                            <th style="padding: 12px;">Артикул (Ваш запрос)</th>
+                            <th style="padding: 12px;">Бренд / Описание товара</th>
+                            <th style="padding: 12px;">Срок доставки</th>
+                            <th style="padding: 12px; text-align: center;">Кол-во</th>
+                            <th style="padding: 12px; text-align: right;">Цена</th>
+                            <th style="padding: 12px; text-align: center;">Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items-body">
+                        <!-- Динамические строки товаров вставляются скриптом во второй части -->  </tbody>
+                </table>
+
+                <!-- ИТОГОВАЯ ПАНЕЛЬ ОФОРМЛЕНИЯ ЗАКАЗА -->
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <div style="font-size: 16px; font-weight: 700; color: #0f172a;">
+                        Итого к оформлению: <span id="cart-total-price" style="color: #ea580c; font-size: 20px;">0 ₽</span>
+                    </div>
+                    <button onclick="checkoutOrder()" style="padding: 12px 30px; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; transition: background 0.2s;">
+                        🚀 Отправить выбранное в Заказ
+                    </button>
+                </div>
+            </div> <!-- /cart-content -->
+        </div> <!-- /cart-card -->
+    </div> <!-- /container -->
+
+    <footer style="text-align: center; padding: 20px; color: #64748b; font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 60px;">
+        <p>&copy; 2026 АвтоМаркет. Все права защищены. Корзина оптовых B2B поставок автозапчастей.</p>
+    </footer>
+
+    <!-- СИНХРОНИЗАЦИЯ ШАПКИ И ИМИТАЦИЯ ТОВАРОВ В КОРЗИНЕ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Настройка отображения профиля закупщика
+            const greetingElement = document.getElementById('nav-user-greeting');
+            const balanceElement = document.getElementById('nav-user-balance');
+            const citySelector = document.getElementById('header-city-select');
+
+            const userName = localStorage.getItem('am_user_name') || 'Иван Иванович';
+            const userBalance = localStorage.getItem('am_user_balance') || '45200';
+
+            if (greetingElement) greetingElement.textContent = `Добрый день, ${userName}!`;
+            if (balanceElement) balanceElement.textContent = `${parseInt(userBalance).toLocaleString('ru-RU')} ₽`;
+
+            if (citySelector) {
+                const savedCity = localStorage.getItem('selectedCity') || 'Москва';
+                citySelector.value = savedCity;
+                citySelector.addEventListener('change', (e) => {
+                    localStorage.setItem('selectedCity', e.target.value);
+                });
+            }
+
+            // 2. Инициализация товаров в корзине для демонстрации
+            renderCartItems();
+        });
+
+        // Демонстрационный массив деталей в корзине
+        let mockCartData = [
+            { article: "W 610/3", title: "MANN-FILTER ФИЛЬТР МАСЛЯНЫЙ", delivery: "Сегодня (Склад-1)", qty: 1, price: 850 },
+            { article: "P 85 020", title: "BREMBO ТОРМОЗНЫЕ КОЛОДКИ ПЕРЕДНИЕ", delivery: "Завтра (Центр)", qty: 1, price: 2000 }
+        ];
+
+        function renderCartItems() {
+            const tbody = document.getElementById('cart-items-body');
+            const contentBlock = document.getElementById('cart-content');
+            const emptyBlock = document.getElementById('empty-cart-message');
+
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (mockCartData.length === 0) {
+                if (contentBlock) contentBlock.style.display = 'none';
+                if (emptyBlock) emptyBlock.style.display = 'block';
+                updateCartCounter(0);
+                return;
+            }
+
+            if (contentBlock) contentBlock.style.display = 'block';
+            if (emptyBlock) emptyBlock.style.display = 'none';
+
+            mockCartData.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = "1px solid #e2e8f0";
+                tr.innerHTML = `
+                    <td style="text-align: center; padding: 12px;"><input type="checkbox" class="item-checkbox" checked onclick="calculateTotal()" style="cursor:pointer;"></td>
+                    <td style="padding: 12px; font-family: monospace; font-weight: bold; color: #475569;">${item.article}</td>
+                    <td style="padding: 12px; font-weight: 600; color: #0f172a;">${item.title}</td>
+                    <td style="padding: 12px; color: #ea580c; font-weight: 500;">${item.delivery}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        <input type="number" value="${item.qty}" min="1" style="width: 50px; padding: 4px; text-align: center; border-radius: 4px; border: 1px solid #cbd5e1;" onchange="updateQty(${index}, this.value)">
+                    </td>
+                    <td style="padding: 12px; text-align: right; font-weight: 700; color: #0f172a;">${(item.price * item.qty).toLocaleString()} ₽</td>
+                    <td style="padding: 12px; text-align: center;"><button onclick="removeItem(${index})" style="background: none; border: none; color: #ef4444; font-weight: bold; cursor: pointer;">❌ Удалить</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            calculateTotal();
+            updateCartCounter(mockCartData.length);
+        }
+
+        function updateQty(index, val) {
+            if (mockCartData[index]) {
+                mockCartData[index].qty = parseInt(val) || 1;
+                renderCartItems();
+            }
+        }
+
+        function removeItem(index) {
+            mockCartData.splice(index, 1);
+            renderCartItems();
+        }
+
+        function toggleAllCheckboxes(master) {
+            document.querySelectorAll('.item-checkbox').forEach(cb => {
+                cb.checked = master.checked;
+            });
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            mockCartData.forEach((item, index) => {
+                if (checkboxes[index] && checkboxes[index].checked) {
+                    total += item.price * item.qty;
+                }
+            });
+            const totalElement = document.getElementById('cart-total-price');
+            if (totalElement) totalElement.textContent = `${total.toLocaleString()} ₽`;
+        }
+
+        function updateCartCounter(count) {
+            const counter = document.getElementById('cart-counter');
+            if (!counter) return;
+            if (count > 0) {
+                counter.textContent = count;
+                counter.style.display = 'inline-block';
+            } else {
+                counter.style.display = 'none';
+            }
+        }
+
+        function checkoutOrder() {
+            alert('🎉 Заказ успешно сформирован и отправлен в Панель Оперативного Управления Менеджера!');
+            mockCartData = [];
+            renderCartItems();
+        }
+
+        function handleLogout(e) {
+            e.preventDefault();
+            localStorage.setItem('am_user_role', 'guest');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

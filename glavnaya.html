@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>АвтоМаркет — Главная страница</title>
+    
+    <!-- СЛУЖЕБНЫЙ ЗАЩИТНЫЙ СКРИПТ: УДЕРЖИВАЕТ СЕССИЮ И ПРЕДОТВРАЩАЕТ ВЫЛЕТЫ -->
+    <script>
+        (function() {
+            let currentRole = localStorage.getItem('am_user_role');
+            let currentUser = localStorage.getItem('am_user_name');
+
+            // Страховка сессии: если вход выполнен под Иваном, принудительно восстанавливаем ключи
+            if (localStorage.getItem('am_user_email') === '123456@mail.ru') {
+                if (!currentRole || currentRole === 'guest') {
+                    localStorage.setItem('am_user_role', 'client');
+                    currentRole = 'client';
+                }
+                if (!currentUser) {
+                    localStorage.setItem('am_user_name', 'Иван Иванович');
+                    localStorage.setItem('am_user_balance', '45200');
+                }
+            }
+
+            // Блокировка: если это гость без логина — отправляем на форму входа
+            if (!currentRole || currentRole === 'guest') {
+                alert("Доступ заблокирован! Пожалуйста, сначала войдите в систему.");
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Стили для тускло-оранжевых полей ввода на главной странице */
+        .login-control-orange {
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid rgba(234, 88, 12, 0.4) !important; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            box-sizing: border-box; 
+            outline: none; 
+            background-color: #ffffff; 
+            color: #000000 !important; 
+            font-weight: 600; 
+            transition: all 0.2s ease-in-out;
+        }
+        .login-control-orange:hover {
+            border-color: rgba(234, 88, 12, 0.8) !important;
+            background-color: #fffaf7;
+        }
+        .login-control-orange:focus {
+            border-color: #ea580c !important;
+            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+            background-color: #ffffff;
+        }
+        .form-group-login {
+            margin-bottom: 12px;
+        }
+        .form-group-login label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 4px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body style="background-color: #f8fafc; margin: 0; padding: 0;">
+
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ ПО ГОРИЗОНТАЛИ -->
+    <header class="main-header" style="background: none; border: none; box-shadow: none; position: relative; z-index: 100;">
+        <div class="header-top">
+            
+            <!-- ЛОГОТИП СТАБИЛЬНО ВЕДЕТ НА ГЛАВНУЮ -->
+            <a href="glavnaya.html" class="logo" style="font-size: 22px; white-space: nowrap; margin-right: 25px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span style="font-weight: 800; letter-spacing: -0.5px; color: #000000;">Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+            <!-- ВЫБОР ГОРОДА -->
+            <div class="city-select">
+                <span>Город: </span>
+                <select id="header-city-select">
+                    <option value="Москва">Москва</option>
+                    <option value="Пенза">Пенза</option>
+                    <option value="Санкт-Петербург">Санкт-Петербург</option>
+                </select>
+            </div>
+
+            <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ -->
+            <nav class="main-nav" style="margin-right: auto;">
+                <a href="glavnaya.html" class="nav-link active">Главная</a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Каталоги ▾</div>
+                    <div class="dropdown-content">
+                        <a href="catalog.html">Оригинальный каталог</a>
+                        <a href="china_catalog.html">Китайский каталог</a>
+                        <a href="replacements_catalog.html">Каталог заменителей</a>
+                        <a href="tyres_catalog.html">Каталог шин и дисков</a>
+                        <a href="lamps_catalog.html">Автолампы</a>
+                        <a href="garage.html">Гараж</a>
+                    </div>
+                </div>
+
+                <a href="cart.html" class="nav-link" id="nav-cart-link">Корзина <span id="cart-counter" style="background: #ea580c; color: white; padding: 2px 7px; border-radius: 20px; font-size: 12px; margin-left: 3px; display: none;">0</span></a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Заказы ▾</div>
+                    <div class="dropdown-content">
+                        <a href="orders.html?action=view">Заказы</a>
+                        <a href="returns.html">Оформление возвратов</a>
+                        <a href="claims.html">Оформление рекламаций</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Взаиморасчеты ▾</div>
+                    <div class="dropdown-content">
+                        <a href="sales.html">Продажи (Архив сделок)</a>
+                        <a href="finance.html">Финансы</a>
+                        <a href="schedule.html">График расчетов</a>
+                    </div>
+                </div>
+
+                <a href="profile.html" class="nav-link">Личные данные</a>
+                <a href="qrcode.html" class="nav-link">Оплата по QR</a>
+            </nav>
+                        
+            <!-- ДИНАМИЧЕСКИЙ БЛОК ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ -->
+            <div class="user-menu" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; line-height: 1.3; padding: 4px 0; font-size: 14px; white-space: nowrap;">
+                <a href="profile.html" id="nav-user-greeting" style="font-weight: 600; color: #0c56ea; text-decoration: none; cursor: pointer; transition: color 0.2s;">Загрузка...</a>
+                <div style="font-weight: 600; color: #000000;">
+                    Баланс: <span style="color: #16a34a;" id="nav-user-balance">0 ₽</span>
+                </div>
+                <a href="#" onclick="handleLogout(event)" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: bold; margin-top: 2px;">Выход</a>
+            </div>
+        </div>
+    </header>
+      <!-- ОСНОВНОЙ КОНТЕНТ СТРАНИЦЫ -->
+      <div class="container" style="width: 92%; max-width: 1400px; margin: 30px auto 0 auto; box-sizing: border-box;">
+        
+        <!-- БЛОК ПРИВЕТСТВИЯ -->
+        <section class="welcome-section" style="margin-bottom: 20px;">
+            <div>
+                <h2 id="page-welcome-title" style="margin: 0; font-size: 24px;">👋 Добро пожаловать в систему оптовых поставок!</h2>
+                <p style="margin: 5px 0 0 0; color: #64748b; font-size: 14px;">Используйте верхнее меню для перехода к каталогам подбора автозапчастей или воспользуйтесь быстрым поиском по артикулу ниже.</p>
+            </div>
+        </section>
+
+        <!-- ДВУХКОЛОНОЧНЫЙ МАКЕТ ДЛЯ ПАНЕЛИ УПРАВЛЕНИЯ И ПОИСКА -->
+        <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 25px; margin-bottom: 30px; align-items: start;">
+            
+            <!-- ЛЕВАЯ КОЛОНКА: ИНТЕГРИРОВАННЫЙ СЕЛЕКТОР И ДЕТАЛЬНАЯ АНКЕТА РЕДАКТИРОВАНИЯ -->
+            <div style="background: #ffffff; padding: 22px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); box-sizing: border-box;">
+                <div class="form-group-login" style="margin-bottom: 15px;">
+                    <label for="global-client-selector" style="font-weight: 700; color: #ea580c; font-size: 13px;">Быстрое переключение аккаунта:</label>
+                    <select id="global-client-selector" class="login-control-orange" style="cursor: pointer;">
+                        <!-- Опции сгенерируются через скрипт в 4-й части -->
+                    </select>
+                </div>
+
+                <!-- ДЕТАЛИЗИРОВАННЫЙ БЛОК РЕДАКТИРОВАНИЯ КАРТОЧКИ (АНКЕТА РЕГИСТРАЦИИ) -->
+                <div id="client-edit-block" style="display: none; margin-top: 15px; border-top: 1px dashed #cbd5e1; padding-top: 15px;">
+                    <h4 style="margin: 0 0 15px 0; font-size: 14px; color: #ea580c; font-weight: 700; text-align: left;">👤 Анкета профиля контрагента</h4>
+                    
+                    <div class="form-group-login">
+                        <label for="edit-client-lastname">Фамилия</label>
+                        <input type="text" id="edit-client-lastname" class="login-control-orange" placeholder="Иванов">
+                    </div>
+
+                    <div class="form-group-login">
+                        <label for="edit-client-firstname">Имя</label>
+                        <input type="text" id="edit-client-firstname" class="login-control-orange" placeholder="Иван">
+                    </div>
+
+                    <div class="form-group-login">
+                        <label for="edit-client-middlename">Отчество</label>
+                        <input type="text" id="edit-client-middlename" class="login-control-orange" placeholder="Иванович">
+                    </div>
+                    <div class="form-group-login">
+                        <label for="edit-client-city">Выбор города / Филиал</label>
+                        <select id="edit-client-city" class="login-control-orange" style="background: white; cursor: pointer;">
+                            <option value="Москва">Москва</option>
+                            <option value="Пенза">Пенза</option>
+                            <option value="Санкт-Петербург">Санкт-Петербург</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-login">
+                        <label for="edit-client-phone">Номер телефона</label>
+                        <input type="text" id="edit-client-phone" class="login-control-orange" placeholder="+7 (999) 000-00-00">
+                    </div>
+
+                    <div class="form-group-login">
+                        <label for="edit-client-email">Электронная почта (Логин)</label>
+                        <input type="email" id="edit-client-email" class="login-control-orange" placeholder="example@mail.ru">
+                    </div>
+
+                    <div class="form-group-login" style="margin-bottom: 20px;">
+                        <label for="edit-client-balance">Живой баланс кабинета (₽)</label>
+                        <input type="number" id="edit-client-balance" class="login-control-orange" style="font-weight: 700; color: #ea580c;">
+                    </div>
+                    
+                    <button id="btn-save-client-data" style="width: 100%; padding: 12px; background: #16a34a; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; transition: background 0.2s;">
+                        💾 Сохранить и применить
+                    </button>
+                </div>
+            </div>
+
+            <!-- ПРАВАЯ КОЛОНКА: СТАНДАРТНАЯ ПОИСКОВАЯ ПРОЦЕНКА -->
+            <section class="search-section" style="background: #ffffff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin: 0; text-align: left;">
+                <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 18px; font-weight: 700; color: #0f172a;">⚙️ Проценка и быстрый подбор деталей</h3>
+                <div class="search-container" style="display: flex; gap: 10px; width: 100%;">
+                    <input type="text" id="main-search-input" class="custom-search-input" placeholder="Введите артикул детали (например: W6103, 334812)..." style="flex-grow: 1;">
+                    <button onclick="executeQuickSearch()" style="padding: 15px 30px; background: #ea580c; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; transition: background 0.2s; white-space: nowrap;">Поиск стоимости</button>
+                </div>
+            </section>
+        </div>
+
+    </div> <!-- /container -->
+
+    <footer style="text-align: center; padding: 20px; color: #64748b; font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 60px;">
+        <p>&copy; 2026 АвтоМаркет. Все права защищены. Личный кабинет системы снабжения СТО и автомагазинов.</p>
+    </footer>
+
+    <script>
+        // ЧАСТЬ А: ПОДКЛЮЧЕНИЕ ОБЩЕЙ БАЗЫ ДАННЫХ ИЗ LOCALSTORAGE
+        function getGlobalDatabase() {
+            const defaultDatabase = {
+                "123456@mail.ru": {
+                    name: "Иван Иванович",
+                    phone: "+7 (999) 111-22-33",
+                    balance: 45200,
+                    password: "123456",
+                    city: "Москва",
+                    tickets: [],
+                    orders: [
+                        { id: "AM-785112", title: "Фильтр масляный MANN-FILTER", article: "W 610/3", price: 850, status: "Создан" },
+                        { id: "AM-785113", title: "Колодки передние Brembo", article: "P 85 020", price: 2000, status: "К отгрузке" }
+                    ]
+                },
+                "777888@mail.ru": {
+                    name: "Петр Петрович",
+                    phone: "+7 (910) 777-88-99",
+                    balance: 14000,
+                    password: "123456",
+                    city: "Санкт-Петербург",
+                    tickets: [],
+                    orders: [
+                        { id: "AM-764301", title: "Амортизатор передний KYB Excel-G", article: "334812", price: 5800, status: "Создан" }
+                    ]
+                }
+            };
+
+            if (!localStorage.getItem('am_global_contractors_db')) {
+                localStorage.setItem('am_global_contractors_db', JSON.stringify(defaultDatabase));
+            }
+            return JSON.parse(localStorage.getItem('am_global_contractors_db'));
+        }
+
+        function saveGlobalDatabase(db) {
+            localStorage.setItem('am_global_contractors_db', JSON.stringify(db));
+        }
+
+        // ЧАСТЬ Б: ПОСТРОЕНИЕ ВЫПАДАЮЩЕГО СПИСКА НА ГЛАВНОЙ СТРАНИЦЕ
+        function renderMainSelectOptions() {
+            const clientSelector = document.getElementById('global-client-selector');
+            if (!clientSelector) return;
+            
+            clientSelector.innerHTML = '<option value="none" disabled>-- Переключить активный аккаунт --</option>';
+            const db = getGlobalDatabase();
+            const activeUserEmail = localStorage.getItem('am_user_email') || '123456@mail.ru';
+
+            Object.keys(db).forEach(emailKey => {
+                const client = db[emailKey];
+                const option = document.createElement('option');
+                option.value = emailKey; 
+                option.textContent = `${emailKey} (${client.name})`;
+                if (emailKey === activeUserEmail) {
+                    option.selected = true;
+                }
+                clientSelector.appendChild(option);
+            });
+        }
+        // ЧАСТЬ В: ОБРАБОТЧИКИ ДИНАМИЧЕСКИХ ОБНОВЛЕНИЙ И ДЕТАЛЬНОГО РАЗБОРА ФИО
+        document.addEventListener('DOMContentLoaded', function() {
+            // Подтягиваем актуальные значения из сессии для отрисовки верхнего поля шапки
+            updateHeaderFields();
+            renderMainSelectOptions();
+            
+            // НОВОЕ: Проверяем корзину и зажигаем цифру 2 в навигационном меню
+            checkCartCount();
+
+            const clientSelector = document.getElementById('global-client-selector');
+            const clientEditBlock = document.getElementById('client-edit-block');
+            
+            const editLastName = document.getElementById('edit-client-lastname');
+            const editFirstName = document.getElementById('edit-client-firstname');
+            const editMiddleName = document.getElementById('edit-client-middlename');
+            const editCity = document.getElementById('edit-client-city');
+            const editPhone = document.getElementById('edit-client-phone');
+            const editEmail = document.getElementById('edit-client-email');
+            const editBalance = document.getElementById('edit-client-balance');
+            
+            const btnSaveClient = document.getElementById('btn-save-client-data');
+            const citySelector = document.getElementById('header-city-select');
+
+            // Умная функция автозаполнения анкеты с разделением ФИО на Фамилию, Имя и Отчество
+            function fillDetailedEditBlock(emailKey) {
+                const db = getGlobalDatabase();
+                const clientData = db[emailKey];
+                
+                if (clientData && clientEditBlock) {
+                    const nameParts = (clientData.name || "").split(" ");
+                    
+                    editLastName.value = nameParts[0] || '';
+                    editFirstName.value = nameParts[1] || '';
+                    editMiddleName.value = nameParts[2] || '';
+                    
+                    editCity.value = clientData.city || 'Москва';
+                    editPhone.value = clientData.phone || '';
+                    editEmail.value = emailKey || '';
+                    editBalance.value = clientData.balance || 0;
+                    
+                    clientEditBlock.style.display = 'block';
+                }
+            }
+
+            // Открываем развернутую карточку текущей сессии Ивана
+            const initialEmail = localStorage.getItem('am_user_email') || '123456@mail.ru';
+            fillDetailedEditBlock(initialEmail);
+
+            // Реактивное переключение пользователя
+            if (clientSelector) {
+                clientSelector.addEventListener('change', function() {
+                    const targetEmail = clientSelector.value;
+                    const db = getGlobalDatabase();
+                    const user = db[targetEmail];
+
+                    if (user) {
+                        localStorage.setItem('am_user_role', 'client');
+                        localStorage.setItem('am_user_name', user.name);
+                        localStorage.setItem('am_user_balance', user.balance);
+                        localStorage.setItem('am_user_phone', user.phone);
+                        localStorage.setItem('am_user_email', targetEmail);
+                        localStorage.setItem('selectedCity', user.city || 'Москва');
+
+                        updateHeaderFields();
+                        fillDetailedEditBlock(targetEmail);
+                    }
+                });
+            }
+
+            // Сборка анкеты и сохранение изменений обратно в LocalStorage
+            if (btnSaveClient) {
+                btnSaveClient.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const originalEmail = localStorage.getItem('am_user_email') || '123456@mail.ru';
+                    let db = getGlobalDatabase();
+
+                    const newLastName = editLastName.value.trim();
+                    const newFirstName = editFirstName.value.trim();
+                    const newMiddleName = editMiddleName.value.trim();
+                    const newEmailValue = editEmail.value.trim();
+
+                    if (!newLastName || !newFirstName) {
+                        alert('Поля "Фамилия" и "Имя" являются строго обязательными!');
+                        return;
+                    }
+
+                    // Собираем сквозную строку ФИО для шапки
+                    const fullCombinedName = `${newLastName} ${newFirstName} ${newMiddleName}`.trim();
+                    
+                    const clientRecord = db[originalEmail] || { tickets: [], orders: [] };
+                    const savedPassword = clientRecord.password || '123456';
+                    const savedTickets = clientRecord.tickets || [];
+                    const savedOrders = clientRecord.orders || [];
+
+                    // Если изменен email-логин, удаляем старый ключ во избежание дублирования
+                    if (originalEmail !== newEmailValue) {
+                        delete db[originalEmail];
+                    }
+
+                    // Перезаписываем обновленный детальный профиль
+                    db[newEmailValue] = {
+                        name: fullCombinedName,
+                        phone: editPhone.value.trim(),
+                        balance: parseInt(editBalance.value.trim()) || 0,
+                        city: editCity.value,
+                        password: savedPassword,
+                        tickets: savedTickets,
+                        orders: savedOrders
+                    };
+
+                    saveGlobalDatabase(db);
+
+                    // Синхронизируем сессию браузера
+                    localStorage.setItem('am_user_email', newEmailValue);
+                    localStorage.setItem('am_user_name', fullCombinedName);
+                    localStorage.setItem('am_user_balance', db[newEmailValue].balance);
+                    localStorage.setItem('am_user_phone', db[newEmailValue].phone);
+                    localStorage.setItem('selectedCity', editCity.value);
+
+                    updateHeaderFields();
+                    renderMainSelectOptions();
+
+                    alert(`🎉 Анкета профиля ${newEmailValue} успешно обновлена во всей системе!`);
+                });
+            }
+        });
+
+        // НОВОЕ: Функция автоматического считывания и прорисовки количества товаров
+        function checkCartCount() {
+            const counter = document.getElementById('cart-counter');
+            if (!counter) return;
+
+            // Имитируем наличие тех же 2 товаров, что прописаны в вашей cart.html
+            let mockCartCount = 2; 
+
+            if (mockCartCount > 0) {
+                counter.textContent = mockCartCount;
+                counter.style.display = 'inline-block';
+            } else {
+                counter.style.display = 'none';
+            }
+        }
+
+        // Функция реактивного обновления полей шапки
+        function updateHeaderFields() {
+            const greetingElement = document.getElementById('nav-user-greeting');
+            const balanceElement = document.getElementById('nav-user-balance');
+            const welcomeTitle = document.getElementById('page-welcome-title');
+            const headerCity = document.getElementById('header-city-select');
+
+            const userName = localStorage.getItem('am_user_name') || 'Иван Иванович';
+            const userBalance = localStorage.getItem('am_user_balance') || '45200';
+            const userCity = localStorage.getItem('selectedCity') || 'Москва';
+
+            if (greetingElement) greetingElement.textContent = `Добрый день, ${userName}!`;
+            if (balanceElement) balanceElement.textContent = `${parseInt(userBalance).toLocaleString('ru-RU')} ₽`;
+            if (welcomeTitle) welcomeTitle.textContent = `👋 Рады видеть вас, ${userName}!`;
+            if (headerCity) headerCity.value = userCity;
+        }
+
+        function executeQuickSearch() {
+            const query = document.getElementById('main-search-input').value.trim();
+            if (!query) {
+                alert('Пожалуйста, введите артикул или номер детали для проценки!');
+                return;
+            }
+            alert(`Идет отправка запроса... Поиск артикула "${query.toUpperCase()}" по центральным складам и заменителям на сервере АвтоМаркет.`);
+        }
+
+        function handleLogout(e) {
+            e.preventDefault();
+            localStorage.setItem('am_user_role', 'guest');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

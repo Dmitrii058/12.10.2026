@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>АвтоМаркет — Оплата по QR</title>
+    <script>
+        (function() {
+            let currentRole = localStorage.getItem('am_user_role');
+            let currentUser = localStorage.getItem('am_user_name');
+
+            // Страховка сессии: если вход выполнен под Иваном, принудительно восстанавливаем ключи
+            if (localStorage.getItem('am_user_email') === '123456@mail.ru') {
+                if (!currentRole || currentRole === 'guest') {
+                    localStorage.setItem('am_user_role', 'client');
+                    currentRole = 'client';
+                }
+                if (!currentUser) {
+                    localStorage.setItem('am_user_name', 'Иван Иванович');
+                    localStorage.setItem('am_user_balance', '45200');
+                }
+            }
+
+            // Блокировка: если это обычный гость без логина — отправляем на index.html
+            if (!currentRole || currentRole === 'guest') {
+                alert("Доступ заблокирован! Пожалуйста, сначала войдите в систему.");
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ -->
+    <header class="main-header" style="background: none; border: none; box-shadow: none;">
+        <div class="header-top">
+            
+            <!-- ЛОГОТИП АВТОМАРКЕТ В ВЕРХНЕМ ЛЕВЫМ УГЛУ -->
+            <a href="glavnaya.html" class="logo" style="font-size: 22px; white-space: nowrap; margin-right: 25px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span style="font-weight: 800; letter-spacing: -0.5px; color: #000000;">Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+            <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ (УНИВЕРСАЛЬНОЕ СКВОЗНОЕ С ПРОФИЛЕМ) -->
+            <nav class="main-nav" style="margin-right: auto;">
+                <a href="glavnaya.html" class="nav-link">Главная</a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Каталоги ▾</div>
+                    <div class="dropdown-content">
+                        <a href="catalog.html">Оригинальный каталог</a>
+                        <a href="china_catalog.html">Китайский каталог</a>
+                        <a href="replacements_catalog.html">Каталог заменителей</a>
+                        <a href="tyres_catalog.html">Каталог шин и дисков</a>
+                        <a href="lamps_catalog.html">Автолампы</a>
+                        <a href="garage.html">Гараж</a>
+                    </div>
+                </div>
+
+                <!-- КОРЗИНА: Сохранен оранжевый кругляшок-счётчик количества товаров -->
+                <a href="cart.html" class="nav-link" id="nav-cart-link">Корзина <span id="cart-counter" style="background: #ea580c; color: white; padding: 2px 7px; border-radius: 20px; font-size: 12px; margin-left: 3px; display: none;">0</span></a>
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Заказы ▾</div>
+                    <div class="dropdown-content">
+                        <a href="orders.html?action=view">Заказы</a>
+                        <a href="returns.html">Оформление возвратов</a>
+                        <a href="claims.html">Оформление рекламаций</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Взаиморасчеты ▾</div>
+                    <div class="dropdown-content">
+                        <a href="sales.html">Продажи (Архив сделок)</a>
+                        <a href="finance.html">Финансы</a>
+                        <a href="schedule.html">График расчетов</a>
+                    </div>
+                </div>
+
+                <!-- ИСПРАВЛЕНО И ДОБАВЛЕНО: Сквозная ссылка на Личный профиль (Карточку клиента) -->
+                <a href="profile.html" class="nav-link">Личные данные</a>
+
+                <a href="qrcode.html" class="nav-link">Оплата по QR</a>
+            </nav>
+
+            <!-- ДИНАМИЧЕСКИЙ БЛОК ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ (ИМЯ СИНИМ ЦВЕТОМ) -->
+            <div class="user-menu" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; line-height: 1.3; padding: 4px 0; font-size: 14px; white-space: nowrap;">
+                <!-- ИСПРАВЛЕНО: Теперь это ссылка на профиль во всех файлах -->
+                <a href="profile.html" id="nav-user-greeting" style="font-weight: 600; color: #0c56ea; text-decoration: none; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#0c56ea'">Загрузка...</a>
+                <div style="font-weight: 600; color: #000000;">
+                    Баланс: <span style="color: #16a34a;" id="nav-user-balance">0 ₽</span>
+                </div>
+                <a href="#" onclick="handleLogout(event)" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: bold; margin-top: 2px;">Выход</a>
+            </div>
+
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="qr-payment-card">
+            <h2>Оплата по СБП (Система быстрых платежей)</h2>
+            <p class="qr-subtitle">Укажите сумму для генерации платежного QR-кода</p>
+
+            <!-- БЛОК ВВОДА СУММЫ И КНОПКА ЗАПУСКА -->
+            <div style="text-align: center; padding: 20px 0;">
+                <label style="display: block; font-size: 15px; color: #334155; margin-bottom: 10px; font-weight: 600;">Сумма пополнения (₽):</label>
+                <input type="text" id="qr-amount-input" class="custom-qr-input" value="9 700">
+                <br>
+                <button class="btn btn-primary" id="generate-qr-btn" style="padding: 12px 25px; font-size: 16px; cursor: pointer; font-weight: bold;">
+                    Оплатить (Сгенерировать QR-код)
+                </button>
+            </div>
+
+            <!-- ЦЕНТРАЛЬНЫЙ БЛОК С QR-КОДОМ -->
+            <div class="centered-qr-container" id="qr-result-block">
+                <div style="font-size: 24px; color: #ea580c; font-weight: bold; margin-bottom: 20px;">
+                    К оплате через СБП: <strong id="qr-amount-value">9 700 ₽</strong>
+                </div>
+
+                <div class="qr-code-wrapper" style="margin-bottom: 20px;">
+                    <img src="https://qrserver.com" alt="QR-код для оплаты" class="qr-image">
+                    <div class="sbp-logo-badge">СБП</div>
+                </div>
+
+                <div style="max-width: 500px; text-align: left; margin: 0 auto;">
+                    <h3 style="text-align: center; margin-bottom: 15px;">Инструкция:</h3>
+                    <ol class="steps-list">
+                        <li>Откройте банковское приложение на телефоне.</li>
+                        <li>Включите сканирование QR-кодов.</li>
+                        <li>Наведите камеру на изображение выше для проведения мгновенного платежа.</li>
+                    </ol>
+                    <div class="qr-alert-info" style="margin-top: 15px; text-align: center;">
+                        ℹ️ Деньги зачислятся на ваш баланс АвтоМаркета сразу после совершения операции.
+                    </div>
+                </div>
+            </div>
+
+            <!-- КНОПКИ НАВИГАЦИИ -->
+            <div class="actions-bar" style="margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+                <a href="orders.html" class="btn btn-secondary">← К списку заказов</a>
+                <a href="glavnaya.html" class="btn btn-primary">На главную</a>
+            </div>
+        </div>
+    </div>
+    <!-- ЛОГИКА СЕССИЙ ПОЛЬЗОВАТЕЛЯ, ГЕНЕРАЦИИ И ЦЕНТРИРОВАНИЯ QR-КОДА -->
+    <script>
+        const qrAmountInput = document.getElementById('qr-amount-input');
+        const generateBtn = document.getElementById('generate-qr-btn');
+        const qrResultBlock = document.getElementById('qr-result-block');
+        const qrAmountValue = document.getElementById('qr-amount-value');
+
+        // БЛОК 1: Подтягивание данных сессии в шапку сайта
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedName = localStorage.getItem('am_user_name');
+            const savedLogin = localStorage.getItem('am_user_login') || '123456@mail.ru';
+            const savedBalance = localStorage.getItem('am_user_balance') || '45200';
+
+            const greetingEl = document.getElementById('nav-user-greeting');
+            const balanceEl = document.getElementById('nav-user-balance');
+
+            if (savedName && savedName.trim() !== '') {
+                greetingEl.innerText = `Добрый день, ${savedName}!`;
+            } else {
+                greetingEl.innerText = `Добро пожаловать, ${savedLogin}`;
+            }
+
+            balanceEl.innerText = parseInt(savedBalance).toLocaleString('ru-RU') + ' ₽';
+            qrAmountInput.focus();
+        });
+
+        // Функция кнопки Выход
+        function handleLogout(event) {
+            event.preventDefault();
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // БЛОК 2: Логика калькулятора ввода и генерации кода
+        qrAmountInput.addEventListener('input', function() {
+            let onlyNums = this.value.replace(/\D/g, '');
+            let numericValue = onlyNums ? parseInt(onlyNums) : 0;
+            this.value = numericValue.toLocaleString('ru-RU');
+            qrResultBlock.style.display = 'none';
+        });
+
+        generateBtn.addEventListener('click', function() {
+            let rawValue = qrAmountInput.value.replace(/\s/g, '');
+            let finalAmount = rawValue ? parseInt(rawValue) : 0;
+
+            if (finalAmount <= 0) {
+                alert('Пожалуйста, введите корректную сумму для генерации платежа!');
+                qrAmountInput.focus();
+                return;
+            }
+
+            qrAmountValue.innerText = finalAmount.toLocaleString('ru-RU') + ' ₽';
+            qrResultBlock.style.display = 'flex';
+            qrResultBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    </script>
+</body>
+</html>

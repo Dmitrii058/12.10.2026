@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>АвтоМаркет — Взаиморасчеты</title>
+    <script>
+        (function() {
+            let currentRole = localStorage.getItem('am_user_role');
+            let currentUser = localStorage.getItem('am_user_name');
+
+            // Страховка сессии: если вход выполнен под Иваном, принудительно восстанавливаем ключи
+            if (localStorage.getItem('am_user_email') === '123456@mail.ru') {
+                if (!currentRole || currentRole === 'guest') {
+                    localStorage.setItem('am_user_role', 'client');
+                    currentRole = 'client';
+                }
+                if (!currentUser) {
+                    localStorage.setItem('am_user_name', 'Иван Иванович');
+                    localStorage.setItem('am_user_balance', '45200');
+                }
+            }
+
+            // Блокировка: если это обычный гость без логина — отправляем на index.html
+            if (!currentRole || currentRole === 'guest') {
+                alert("Доступ заблокирован! Пожалуйста, сначала войдите в систему.");
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ -->
+    <header class="main-header" style="background: none; border: none; box-shadow: none;">
+        <div class="header-top">
+            
+            <!-- ЛОГОТИП АВТОМАРКЕТ -->
+            <a href="glavnaya.html" class="logo" style="font-size: 22px; white-space: nowrap; margin-right: 25px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span style="font-weight: 800; letter-spacing: -0.5px; color: #000000; text-decoration: none !important;">Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+            <!-- ВЫБОР ГОРОДА -->
+            <div class="city-select">
+                <span>Город: </span>
+                <select id="city-selector">
+                    <option value="Москва">Москва</option>
+                    <option value="Пенза">Пенза</option>
+                    <option value="Санкт-Петербург">Санкт-Петербург</option>
+                </select>
+            </div>
+
+            <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ -->
+            <nav class="main-nav">
+                <a href="glavnaya.html" class="nav-link">Главная</a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Каталоги ▾</div>
+                    <div class="dropdown-content">
+                        <a href="catalog.html">Оригинальный каталог</a>
+                        <a href="china_catalog.html">Китайский каталог</a>
+                        <a href="replacements_catalog.html">Каталог заменителей</a>
+                        <a href="tyres_catalog.html">Каталог шин и дисков</a>
+                        <a href="lamps_catalog.html">Автолампы</a>
+                        <a href="garage.html">Гараж</a>
+                    </div>
+                </div>
+
+                <a href="cart.html" class="nav-link" id="nav-cart-link">Корзина <span id="cart-counter" style="background: #ea580c; color: white; padding: 2px 7px; border-radius: 20px; font-size: 12px; margin-left: 3px; display: none;">0</span></a>
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Заказы ▾</div>
+                    <div class="dropdown-content">
+                        <a href="orders.html?action=view">Заказы</a>
+                        <a href="returns.html">Оформление возвратов</a>
+                        <a href="claims.html">Оформление рекламаций</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Взаиморасчеты ▾</div>
+                    <div class="dropdown-content">
+                        <a href="sales.html">Продажи (Архив сделок)</a>
+                        <a href="finance.html">Финансы</a>
+                        <a href="schedule.html">График расчетов</a>
+                    </div>
+                </div>
+
+                <a href="profile.html" class="nav-link">Личные данные</a>
+                <a href="qrcode.html" class="nav-link">Оплата по QR</a>
+            </nav>
+
+            <!-- ДИНАМИЧЕСКИЙ БЛОК ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ -->
+            <div class="user-menu" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; line-height: 1.3; padding: 4px 0; font-size: 14px; white-space: nowrap;">
+                <a href="profile.html" id="nav-user-greeting" style="font-weight: 600; color: #0c56ea; text-decoration: none; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#0c56ea'">Загрузка...</a>
+                <div style="font-weight: 600; color: #000000;">
+                    Баланс: <span style="color: #16a34a;" id="nav-user-balance">0 ₽</span>
+                </div>
+                <a href="#" onclick="handleLogout(event)" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: bold; margin-top: 2px;">Выход</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="finance-card" style="background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <h2>Финансовое состояние и взаиморасчеты</h2>
+            <p style="color: #64748b; margin-top: -5px; margin-bottom: 25px;">Мониторинг движения средств, проведенных платежей и графиков погашения задолженностей.</p>
+
+            <!-- ИНФОРМАЦИОННЫЕ БЛОКИ С БАЛАНСОМ -->
+            <div class="finance-overview-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                <div class="overview-item positive" style="background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div class="overview-label" style="color: #64748b; font-size: 14px;">Текущий баланс</div>
+                    <div class="overview-value" style="color: #16a34a; font-size: 24px; font-weight: 700; margin-top: 5px;" id="finance-card-balance">+45 200 ₽</div>
+                </div>
+                <div class="overview-item" style="background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div class="overview-label" style="color: #64748b; font-size: 14px;">Сумма в работе (Заказы)</div>
+                    <div class="overview-value" style="font-size: 24px; font-weight: 700; margin-top: 5px;">9 700 ₽</div>
+                </div>
+                <div class="overview-item warning" style="background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div class="overview-label" style="color: #64748b; font-size: 14px;">Ближайший платеж</div>
+                    <div class="overview-value" style="color: #ea580c; font-size: 24px; font-weight: 700; margin-top: 5px;" id="finance-card-payment">0 ₽</div>
+                </div>
+            </div>
+
+            <!-- ИНТЕРАКТИВНЫЕ ВКЛАДКИ -->
+            <div class="finance-tabs">
+                <button class="finance-tab-btn active" id="tab-btn-history" onclick="switchFinanceTab('history')" style="padding: 10px 20px; border: none; background: #ea580c; color: white; border-radius: 6px; font-weight: 600; cursor: pointer; margin-right: 5px;">История операций</button>
+            </div>
+
+            <!-- ВКЛАДКА 1: ИСТОРИЯ ОПЕРАЦИЙ -->
+            <div id="finance-tab-content-history" class="finance-screen-content" style="margin-top: 20px;">
+               
+
+                <div class="table-responsive">
+                    <table class="finance-table" style="width: 100%; border-collapse: collapse; text-align: left; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                        <thead>
+                            <tr style="background: #f1f5f9;">
+                                <th style="padding: 12px;">Дата</th>
+                                <th style="padding: 12px;">Документ / Назначение платежа</th>
+                                <th style="padding: 12px;">Тип</th>
+                                <th style="padding: 12px;">Сумма операции</th>
+                            </tr>
+                        </thead>
+                        <tbody id="finance-history-rows">
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 12px;">30.09.2026</td>
+                                <td style="padding: 12px;">Пополнение баланса (Оплата по QR, СБП)</td>
+                                <td style="padding: 12px;">Приход</td>
+                                <td style="padding: 12px; color: #16a34a; font-weight: 600;">+15 000 ₽</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 12px;">30.09.2026</td>
+                                <td style="padding: 12px;">Списание по заказу № AM-789423</td>
+                                <td style="padding: 12px;">Расход</td>
+                                <td style="padding: 12px; color: #dc2626; font-weight: 600;">-9 700 ₽</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 12px;">15.09.2026</td>
+                                <td style="padding: 12px;">Списание по заказу № AM-785112</td>
+                                <td style="padding: 12px;">Расход</td>
+                                <td style="padding: 12px; color: #dc2626; font-weight: 600;">-3 200 ₽</td>

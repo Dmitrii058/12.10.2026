@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>АвтоМаркет — Каталог шин и дисков</title>
+    <script>
+        (function() {
+            let currentRole = localStorage.getItem('am_user_role');
+            let currentUser = localStorage.getItem('am_user_name');
+
+            // Страховка сессии: если вход выполнен под Иваном, принудительно восстанавливаем ключи
+            if (localStorage.getItem('am_user_email') === '123456@mail.ru') {
+                if (!currentRole || currentRole === 'guest') {
+                    localStorage.setItem('am_user_role', 'client');
+                    currentRole = 'client';
+                }
+                if (!currentUser) {
+                    localStorage.setItem('am_user_name', 'Иван Иванович');
+                    localStorage.setItem('am_user_balance', '45200');
+                }
+            }
+
+            // Блокировка: если это обычный гость без логина — отправляем на index.html
+            if (!currentRole || currentRole === 'guest') {
+                alert("Доступ заблокирован! Пожалуйста, сначала войдите в систему.");
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Локальные стили для красивой сетки брендов шин и дисков */
+        .catalog-section-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .brands-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .brand-item { background: #ffffff; border: 2px solid #e2e8f0; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+        .brand-item:hover { border-color: #ea580c; background: #fff7ed; transform: translateY(-2px); }
+        .brand-item.selected { border-color: #ea580c; background: #fff7ed; box-shadow: 0 4px 6px -1px rgba(234, 88, 12, 0.15); }
+        .brand-logo-placeholder { width: 50px; height: 50px; background: #ea580c; color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin: 0 auto 12px; font-weight: bold; font-size: 18px; user-select: none; }
+        .brand-name { font-weight: 600; color: #0f172a; }
+        .selection-panel { display: none; margin-top: 30px; animation: tyresSlideUp 0.3s ease forwards; }
+        @keyframes tyresSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ ПО ГОРИЗОНТАЛИ -->
+    <header class="main-header" style="background: none; border: none; box-shadow: none;">
+        <div class="header-top">
+            
+            <!-- ЛОГОТИП АВТОМАРКЕТ В ВЕРХНЕМ ЛЕВЫМ УГЛУ (КЛИКАБЕЛЬНЫЙ) -->
+            <a href="glavnaya.html" class="logo" style="font-size: 22px; white-space: nowrap; margin-right: 25px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 2px 4px rgba(234, 88, 12, 0.2));">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span style="font-weight: 800; letter-spacing: -0.5px; color: #000000;">Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+            <!-- ВЫБОР ГОРОДА -->
+            <div class="city-select">
+                <span>Город: </span>
+                <select>
+                    <option selected>Москва</option>
+                    <option>Пенза</option>
+                    <option>Санкт-Петербург</option>
+                </select>
+            </div>
+
+            <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ (УНИВЕРСАЛЬНОЕ СКВОЗНОЕ С ПРОФИЛЕМ) -->
+            <nav class="main-nav" style="margin-right: auto;">
+                <a href="glavnaya.html" class="nav-link">Главная</a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Каталоги ▾</div>
+                    <div class="dropdown-content">
+                        <a href="catalog.html">Оригинальный каталог</a>
+                        <a href="china_catalog.html">Китайский каталог</a>
+                        <a href="replacements_catalog.html">Каталог заменителей</a>
+                        <a href="tyres_catalog.html">Каталог шин и дисков</a>
+                        <a href="lamps_catalog.html">Автолампы</a>
+                        <a href="garage.html">Гараж</a>
+                    </div>
+                </div>
+
+                <!-- КОРЗИНА: Сохранен оранжевый кругляшок-счётчик количества товаров -->
+                <a href="cart.html" class="nav-link" id="nav-cart-link">Корзина <span id="cart-counter" style="background: #ea580c; color: white; padding: 2px 7px; border-radius: 20px; font-size: 12px; margin-left: 3px; display: none;">0</span></a>
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Заказы ▾</div>
+                    <div class="dropdown-content">
+                        <a href="orders.html?action=view">Заказы</a>
+                        <a href="returns.html">Оформление возвратов</a>
+                        <a href="claims.html">Оформление рекламаций</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Взаиморасчеты ▾</div>
+                    <div class="dropdown-content">
+                        <a href="sales.html">Продажи (Архив сделок)</a>
+                        <a href="finance.html">Финансы</a>
+                        <a href="schedule.html">График расчетов</a>
+                    </div>
+                </div>
+
+                <!-- ИСПРАВЛЕНО И ДОБАВЛЕНО: Сквозная ссылка на Личный профиль (Карточку клиента) -->
+                <a href="profile.html" class="nav-link">Личные данные</a>
+
+                <a href="qrcode.html" class="nav-link">Оплата по QR</a>
+            </nav>
+
+            <!-- ДИНАМИЧЕСКИЙ БЛОК ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ (ИМЯ СИНИМ ЦВЕТОМ) -->
+            <div class="user-menu" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; line-height: 1.3; padding: 4px 0; font-size: 14px; white-space: nowrap;">
+                <!-- ИСПРАВЛЕНО: Теперь это ссылка на профиль во всех файлах -->
+                <a href="profile.html" id="nav-user-greeting" style="font-weight: 600; color: #0c56ea; text-decoration: none; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#0c56ea'">Загрузка...</a>
+                <div style="font-weight: 600; color: #000000;">
+                    Баланс: <span style="color: #16a34a;" id="nav-user-balance">0 ₽</span>
+                </div>
+                <a href="#" onclick="handleLogout(event)" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: bold; margin-top: 2px;">Выход</a>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ СТРАНИЦЫ -->
+    <div class="container" style="margin-top: 30px;">
+        
+        <!-- ЗАГЛОВОК СЕКЦИИ С КАРТИНКОЙ КОЛЕСА -->
+        <div class="catalog-section-title" style="display: flex; align-items: center; gap: 12px; margin-bottom: 25px; font-size: 24px; font-weight: 700; color: #000000;">
+            <svg width="32" height="34" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 2px 4px rgba(234, 88, 12, 0.25)); flex-shrink: 0;">
+                <circle cx="12" cy="12" r="10" stroke="#000000" stroke-width="2"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="1.5" fill="#ea580c" stroke="#ea580c"/>
+                <path d="M12 2v4M12 18v4M2 12h4M18 12h2M4.93 4.93l2.83 2.47M16.24 16.6l2.83 2.47M4.93 19.07l2.83-2.47M16.24 7.4l2.83-2.47"/>
+            </svg>
+            <span>Каталог шин и автомобильных дисков</span>
+        </div>
+
+        <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 15px;">
+            Выберите интересующего производителя шин или колесных дисков для точного подбора по сезонности, радиусу, ширине профиля и разболтовке вашей модели автомобиля.
+        </p>
+
+        <!-- СЕТКА ДЛЯ ВЫБОРА БРЕНДОВ ШИН И ДИСКОВ -->
+        <div class="brands-grid">
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'Michelin')">
+                <div class="brand-logo-placeholder">MI</div>
+                <div class="brand-name">Michelin</div>
+            </div>
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'Bridgestone')">
+                <div class="brand-logo-placeholder">BS</div>
+                <div class="brand-name">Bridgestone</div>
+            </div>
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'Continental')">
+                <div class="brand-logo-placeholder">CO</div>
+                <div class="brand-name">Continental</div>
+            </div>
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'Pirelli')">
+                <div class="brand-logo-placeholder">PI</div>
+                <div class="brand-name">Pirelli</div>
+            </div>
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'Yokohama')">
+                <div class="brand-logo-placeholder">YK</div>
+                <div class="brand-name">Yokohama</div>
+            </div>
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'Nokian Tyres')">
+                <div class="brand-logo-placeholder">NK</div>
+                <div class="brand-name">Nokian Tyres</div>
+            </div>
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'Hankook')">
+                <div class="brand-logo-placeholder">HK</div>
+                <div class="brand-name">Hankook</div>
+            </div>
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'BBS Wheels')">
+                <div class="brand-logo-placeholder">BBS</div>
+                <div class="brand-name">BBS Wheels</div>
+            </div>
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'Alutec')">
+                <div class="brand-logo-placeholder">AL</div>
+                <div class="brand-name">Alutec Discs</div>
+            </div>
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'Dotz')">
+                <div class="brand-logo-placeholder">DZ</div>
+                <div class="brand-name">Dotz Wheels</div>
+            </div>
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'Borbet')">
+                <div class="brand-logo-placeholder">BB</div>
+                <div class="brand-name">Borbet</div>
+            </div>
+            <div class="brand-item tyre-brand" onclick="toggleTyreBrand(this, 'Enkei')">
+                <div class="brand-logo-placeholder">EK</div>
+                <div class="brand-name">Enkei Discs</div>
+            </div>
+        </div>
+
+        <!-- ИНФОРМАЦИОННАЯ ПАНЕЛЬ ПРИ ВЫБОРЕ БРЕНДА -->
+        <div id="tyre-selection-panel" class="selection-panel">
+            <div class="orange-muted-card" style="padding: 30px; background: #ffffff; border-left: 4px solid #ea580c; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+ <!-- ЛОГИКА СЕССИЙ ПОЛЬЗОВАТЕЛЯ И ИНТЕРАКТИВНОГО ВЫБОРА БРЕНДОВ ШИН И ДИСКОВ -->
+ <script>
+    // БЛОК 1: Подтягивание данных сессии в шапку сайта
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedName = localStorage.getItem('am_user_name');
+        const savedLogin = localStorage.getItem('am_user_login') || '123456@mail.ru';
+        const savedBalance = localStorage.getItem('am_user_balance') || '45200';
+
+        const greetingEl = document.getElementById('nav-user-greeting');
+        const balanceEl = document.getElementById('nav-user-balance');
+
+        if (savedName && savedName.trim() !== '') {
+            greetingEl.innerText = `Добрый день, ${savedName}!`;
+        } else {
+            greetingEl.innerText = `Добро пожаловать, ${savedLogin}`;
+        }
+
+        balanceEl.innerText = parseInt(savedBalance).toLocaleString('ru-RU') + ' ₽';
+    });
+
+    // Функция кнопки Выход
+    function handleLogout(event) {
+        event.preventDefault();
+        localStorage.clear();
+        window.location.href = 'index.html';
+    }
+
+    // БЛОК 2: Управление панелью выбора бренда шин и дисков
+    function toggleTyreBrand(element, brandName) {
+        const isAlreadySelected = element.classList.contains('selected');
+
+        document.querySelectorAll('.brand-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+
+        const selectionPanel = document.getElementById('tyre-selection-panel');
+        const brandSpan = document.getElementById('selected-tyre-brand');
+
+        if (isAlreadySelected) {
+            selectionPanel.style.display = 'none';
+            brandSpan.innerText = '—';
+        } else {
+            element.classList.add('selected');
+            brandSpan.innerText = brandName;
+            selectionPanel.style.display = 'block';
+            selectionPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+</script>
+</body>
+</html>

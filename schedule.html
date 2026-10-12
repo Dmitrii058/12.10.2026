@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>АвтоМаркет — График расчетов</title>
+    <script>
+        (function() {
+            let currentRole = localStorage.getItem('am_user_role');
+            let currentUser = localStorage.getItem('am_user_name');
+
+            // Страховка сессии: если вход выполнен под Иваном, принудительно восстанавливаем ключи
+            if (localStorage.getItem('am_user_email') === '123456@mail.ru') {
+                if (!currentRole || currentRole === 'guest') {
+                    localStorage.setItem('am_user_role', 'client');
+                    currentRole = 'client';
+                }
+                if (!currentUser) {
+                    localStorage.setItem('am_user_name', 'Иван Иванович');
+                    localStorage.setItem('am_user_balance', '45200');
+                }
+            }
+
+            // Блокировка: если это обычный гость без логина — отправляем на index.html
+            if (!currentRole || currentRole === 'guest') {
+                alert("Доступ заблокирован! Пожалуйста, сначала войдите в систему.");
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ -->
+    <header class="main-header" style="background: none; border: none; box-shadow: none;">
+        <div class="header-top">
+            
+            <!-- ЛОГОТИП АВТОМАРКЕТ В ВЕРХНЕМ ЛЕВЫМ УГЛУ -->
+            <a href="glavnaya.html" class="logo" style="font-size: 22px; white-space: nowrap; margin-right: 25px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span style="font-weight: 800; letter-spacing: -0.5px; color: #000000; text-decoration: none !important;">Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+            <!-- ВЫБОР ГОРОДА (ДОБАВЛЕНО И СИНХРОНИЗИРОВАНО) -->
+            <div class="city-select">
+                <span>Город: </span>
+                <select id="city-selector">
+                    <option value="Москва">Москва</option>
+                    <option value="Пенза">Пенза</option>
+                    <option value="Санкт-Петербург">Санкт-Петербург</option>
+                </select>
+            </div>
+
+            <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ -->
+            <nav class="main-nav">
+                <a href="glavnaya.html" class="nav-link">Главная</a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Каталоги ▾</div>
+                    <div class="dropdown-content">
+                        <a href="catalog.html">Оригинальный каталог</a>
+                        <a href="china_catalog.html">Китайский каталог</a>
+                        <a href="replacements_catalog.html">Каталог заменителей</a>
+                        <a href="tyres_catalog.html">Каталог шин и дисков</a>
+                        <a href="lamps_catalog.html">Автолампы</a>
+                        <a href="garage.html">Гараж</a>
+                    </div>
+                </div>
+
+                <!-- КОРЗИНА -->
+                <a href="cart.html" class="nav-link" id="nav-cart-link">Корзина <span id="cart-counter" style="background: #ea580c; color: white; padding: 2px 7px; border-radius: 20px; font-size: 12px; margin-left: 3px; display: none;">0</span></a>
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Заказы ▾</div>
+                    <div class="dropdown-content">
+                        <a href="orders.html?action=view">Заказы</a>
+                        <a href="returns.html">Оформление возвратов</a>
+                        <a href="claims.html">Оформление рекламаций</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Взаиморасчеты ▾</div>
+                    <div class="dropdown-content">
+                        <a href="sales.html">Продажи (Архив сделок)</a>
+                        <a href="finance.html">Финансы</a>
+                        <a href="schedule.html">График расчетов</a>
+                    </div>
+                </div>
+
+                <a href="profile.html" class="nav-link">Личные данные</a>
+                <a href="qrcode.html" class="nav-link">Оплата по QR</a>
+            </nav>
+
+            <!-- ДИНАМИЧЕСКИЙ БЛОК ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ -->
+            <div class="user-menu" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; line-height: 1.3; padding: 4px 0; font-size: 14px; white-space: nowrap;">
+                <a href="profile.html" id="nav-user-greeting" style="font-weight: 600; color: #0c56ea; text-decoration: none; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#0c56ea'">Загрузка...</a>
+                <div style="font-weight: 600; color: #000000;">
+                    Баланс: <span style="color: #16a34a;" id="nav-user-balance">0 ₽</span>
+                </div>
+                <a href="#" onclick="handleLogout(event)" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: bold; margin-top: 2px;">Выход</a>
+            </div>
+
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="schedule-card">
+            <h2>График финансовых расчетов по заказам</h2>
+            <p style="color: #64748b; margin-top: -5px; margin-bottom: 25px;">
+                Ниже приведён контроль постоплаты ваших заказов. <span style="color: #ef4444; font-weight: 600;">Красным цветом</span> выделены позиции, срок оплаты которых истекает через 7 дней или меньше.
+            </p>
+
+            <div class="table-responsive">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Номер заказа</th>
+                            <th>Дата покупки</th>
+                            <th>Крайний срок оплаты</th>
+                            <th>Осталось времени</th>
+                            <th>Сумма долга</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-debts-body">
+                        <!-- Строки генерируются через JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ВСТРОЕННЫЙ ИСПРАВЛЕННЫЙ СКРИПТ (ВНЕШНИЙ СКРИПТ БОЛЬШЕ НЕ НУЖЕН) -->
+    <script>
+        // Текущая серверная дата для расчетов
+        const currentServerDate = new Date(2026, 8, 30); 
+
+        // База задолженностей
+        const debtsDatabase = [
+            { id: "AM-781205", buyDate: "28.09.2026", deadline: new Date(2026, 9, 3), amount: 4800 },  
+            { id: "AM-780194", buyDate: "25.09.2026", deadline: new Date(2026, 9, 7), amount: 12400 }, 
+            { id: "AM-776410", buyDate: "20.09.2026", deadline: new Date(2026, 9, 12), amount: 6150 }, 
+            { id: "AM-773105", buyDate: "10.09.2026", deadline: new Date(2026, 9, 20), amount: 8900 }  
+        ];
+
+        // Запуск логики сразу при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 1. МГНОВЕННЫЙ ВЫВОД ИМЕНИ И БАЛАНСА БЕЗ ОШИБОК И ОЖИДАНИЯ
+            const greetingEl = document.getElementById('nav-user-greeting');
+            const balanceEl = document.getElementById('nav-user-balance');
+
+            if (greetingEl) {
+                greetingEl.innerText = 'Добро пожаловать, Иван Иванович';
+            }
+            if (balanceEl) {
+                balanceEl.innerText = '45 200 ₽';
+            }
+
+            // 2. Синхронизация городов по локальной памяти
+            const citySelector = document.getElementById('city-selector');
+            if (citySelector) {
+                const savedCity = localStorage.getItem('selectedCity');
+                if (savedCity) {
+                    citySelector.value = savedCity;
+                }
+                citySelector.addEventListener('change', (event) => {
+                    localStorage.setItem('selectedCity', event.target.value);
+                });
+            }
+            
+            // 3. Вызов генерации таблицы задолженностей
+            renderScheduleTable();
+        });
+
+        // Функция кнопки Выход
+        function handleLogout(event) {
+            event.preventDefault();
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // Построение таблицы и бейджей времени
+        function renderScheduleTable() {
+            const tbody = document.getElementById('schedule-debts-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            debtsDatabase.forEach(item => {
+                const timeDiff = item.deadline.getTime() - currentServerDate.getTime();
+                const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+                let textClass = "";
+                let badgeClass = "";
+                
+                // ВАШЕ ПРАВИЛО: Менее или равно 7 дней — красим в КРАСНЫЙ
+                if (daysLeft > 7) {
+                    textClass = "debt-urgent"; // Стили добавлены в ваш styles.css
+                    badgeClass = "days-badge badge-urgent";
+                } else {
+                    textClass = "debt-normal";
+                    badgeClass = "days-badge badge-normal";
+                }
+
+                const formattedDeadline = item.deadline.toLocaleDateString('ru-RU', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong style="color: #ea580c;">№ ${item.id}</strong></td>
+                    <td>${item.buyDate}</td>
+                    <td>${formattedDeadline}</td>
+                    <td><span class="${badgeClass || 'days-badge'}">${daysLeft} дн.</span></td>
+                    <td class="${textClass}">${item.amount.toLocaleString('ru-RU')} ₽</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>

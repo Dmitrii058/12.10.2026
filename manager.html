@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>АвтоМаркет — Обращение к менеджеру</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ -->
+    <header class="main-header" style="background: none; border: none; box-shadow: none; position: relative; z-index: 100;">
+        <div class="header-top">
+            <a href="glavnaya.html" class="logo" style="font-size: 22px; white-space: nowrap; margin-right: 25px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span style="font-weight: 800; letter-spacing: -0.5px; color: #000000;">Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+           <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ (УНИВЕРСАЛЬНОЕ СКВОЗНОЕ С ПРОФИЛЕМ) -->
+           <nav class="main-nav" style="margin-right: auto;">
+            <a href="glavnaya.html" class="nav-link">Главная</a>
+            
+            <div class="dropdown">
+                <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Каталоги ▾</div>
+                <div class="dropdown-content">
+                    <a href="catalog.html">Оригинальный каталог</a>
+                    <a href="china_catalog.html">Китайский каталог</a>
+                    <a href="replacements_catalog.html">Каталог заменителей</a>
+                    <a href="tyres_catalog.html">Каталог шин и дисков</a>
+                    <a href="lamps_catalog.html">Автолампы</a>
+                    <a href="garage.html">Гараж</a>
+                </div>
+            </div>
+
+            <!-- КОРЗИНА: Сохранен оранжевый кругляшок-счётчик количества товаров -->
+            <a href="cart.html" class="nav-link" id="nav-cart-link">Корзина <span id="cart-counter" style="background: #ea580c; color: white; padding: 2px 7px; border-radius: 20px; font-size: 12px; margin-left: 3px; display: none;">0</span></a>
+            <div class="dropdown">
+                <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Заказы ▾</div>
+                <div class="dropdown-content">
+                    <a href="orders.html?action=view">Заказы</a>
+                    <a href="returns.html">Оформление возвратов</a>
+                    <a href="claims.html">Оформление рекламаций</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Взаиморасчеты ▾</div>
+                <div class="dropdown-content">
+                    <a href="sales.html">Продажи (Архив сделок)</a>
+                    <a href="finance.html">Финансы</a>
+                    <a href="schedule.html">График расчетов</a>
+                </div>
+            </div>
+
+            <!-- ИСПРАВЛЕНО И ДОБАВЛЕНО: Сквозная ссылка на Личный профиль (Карточку клиента) -->
+            <a href="profile.html" class="nav-link">Личные данные</a>
+
+            <a href="qrcode.html" class="nav-link">Оплата по QR</a>
+        </nav>
+
+        <div class="user-menu" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; line-height: 1.3; padding: 4px 0; font-size: 14px; white-space: nowrap;">
+            <!-- ИСПРАВЛЕНО: Теперь это ссылка на профиль во всех файлах -->
+            <a href="profile.html" id="nav-user-greeting" style="font-weight: 600; color: #0c56ea; text-decoration: none; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#0c56ea'">Загрузка...</a>
+            <div style="font-weight: 600; color: #000000;">
+                Баланс: <span style="color: #16a34a;" id="nav-user-balance">0 ₽</span>
+            </div>
+            <a href="#" onclick="handleLogout(event)" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: bold; margin-top: 2px;">Выход</a>
+        </div>
+        </div>
+    </header>
+    <div class="container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+        <!-- ЛЕВАЯ СТОРОНА: ФОРМА ОТПРАВКИ -->
+        <div class="schedule-card" style="margin: 0; padding: 30px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <h2 id="manager-welcome-title">Добрый день!</h2>
+            <p style="color: #64748b; margin-top: 4px; margin-bottom: 25px; font-size: 15px;">
+                Опишите ваш вопрос ниже. Наш менеджер обработает тикет прямо здесь в течение нескольких секунд.
+            </p>
+
+            <form id="managerForm" onsubmit="submitClientTicket(event)">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px;">Тема обращения</label>
+                    <select id="request-subject" required>
+                        <option value="Помощь в подборе запчастей">Помощь в подборе запчастей</option>
+                        <option value="Вопрос по балансу или взаиморасчетам">Вопрос по балансу или взаиморасчетам</option>
+                        <option value="Задержка или изменение сроков заказа">Задержка или изменение сроков заказа</option>
+                        <option value="Другой технический вопрос">Другой технический вопрос</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label for="request-text" style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px;">Текст вашего запроса</label>
+                    <textarea id="request-text" style="width: 100%; min-height: 120px; padding: 15px; font-family: inherit; resize: vertical;" placeholder="Укажите артикул детали или опишите ситуацию..." required></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                    <a href="glavnaya.html" style="color: #64748b; text-decoration: none; font-weight: 600; font-size: 14px;">Назад</a>
+                    <button type="submit" class="search-btn" style="background-color: #ea580c; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 15px; flex-grow: 1; text-align: center;">
+                        Отправить обращение
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ПРАВАЯ СТОРОНА: ИСТОРИЯ ОБРАЩЕНИЙ С ЖИВОЙ ФИЛЬТРАЦИЕЙ И ОРАНЖЕВЫМ СТИЛЕМ -->
+        <div class="schedule-card" style="margin: 0; padding: 30px; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column;">
+            <h3 style="color: #0c56ea; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <span>📥</span> История ваших обращений (Онлайн-связь)
+            </h3>
+            
+            <!-- ИНТЕРФЕЙС ФИЛЬТРАЦИИ И ПОИСКА -->
+            <div style="background: rgba(249, 115, 22, 0.01); border: 1px solid #fdba74; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 12px; color: #475569;">Фильтр по тематике:</label>
+                    <select id="filter-subject" onchange="renderLocalTickets()" style="width: 100%; padding: 10px; border-radius: 8px; font-size: 13px;">
+                        <option value="all">Все темы обращений</option>
+                        <option value="Помощь в подборе запчастей">Помощь в подборе запчастей</option>
+                        <option value="Вопрос по балансу или взаиморасчетам">Вопрос по балансу или взаиморасчетам</option>
+                        <option value="Задержка или изменение сроков заказа">Задержка или изменение сроков заказа</option>
+                        <option value="Другой технический вопрос">Другой технический вопрос</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 12px; color: #475569;">Поиск по тексту или ID:</label>
+                    <input type="text" id="filter-search" class="custom-search-input" oninput="renderLocalTickets()" placeholder="Введите слово для поиска в тексте..." style="width: 100%; padding: 10px; font-size: 13px; box-sizing: border-box;">
+                </div>
+            </div>
+            
+            <!-- ЛЕНТА ВЫВОДА ТТИКЕТОВ -->
+            <div id="tickets-history-container" style="flex-grow: 1; overflow-y: auto; max-height: 320px; display: flex; flex-direction: column; gap: 15px;">
+                <!-- Строки генерируются через функцию renderLocalTickets -->
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Защита авторизации
+            const userRole = localStorage.getItem('am_user_role');
+            if (userRole !== 'client') {
+                alert('Доступ заблокирован! Пожалуйста, пройдите авторизацию.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const savedName = localStorage.getItem('am_user_name');
+            const savedLogin = localStorage.getItem('am_user_login') || '123456@mail.ru';
+            const savedBalance = localStorage.getItem('am_user_balance') || '45200';
+
+            const greetingEl = document.getElementById('nav-user-greeting');
+            const balanceEl = document.getElementById('nav-user-balance');
+            const welcomeTitleEl = document.getElementById('manager-welcome-title');
+
+            let userIdentifier = savedLogin;
+            if (savedName && savedName.trim() !== '') {
+                userIdentifier = savedName;
+                if (greetingEl) greetingEl.innerText = `Добрый день, ${savedName}!`;
+            } else {
+                if (greetingEl) greetingEl.innerText = `Добро пожаловать, ${savedLogin}`;
+            }
+
+            if (balanceEl) balanceEl.innerText = parseInt(savedBalance).toLocaleString('ru-RU') + ' ₽';
+            if (welcomeTitleEl) welcomeTitleEl.innerText = `Добрый день, ${userIdentifier}!`;
+
+            // Первичный вывод данных
+            renderLocalTickets();
+        });
+
+        // Отправка обращения
+        function submitClientTicket(event) {
+            event.preventDefault();
+            
+            const subject = document.getElementById('request-subject').value;
+            const text = document.getElementById('request-text').value;
+
+            let myTickets = JSON.parse(localStorage.getItem('am_demo_page_tickets') || '[]');
+
+            const newTicket = {
+                id: "TICK-" + Math.floor(1000 + Math.random() * 9000),
+                subject: subject,
+                text: text,
+                date: new Date().toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'}),
+                answer: null
+            };
+
+            myTickets.unshift(newTicket); 
+            localStorage.setItem('am_demo_page_tickets', JSON.stringify(myTickets));
+            
+            // Очищаем форму и сбрасываем фильтры, чтобы новое письмо было сразу видно
+            document.getElementById('filter-subject').value = 'all';
+            document.getElementById('filter-search').value = '';
+            document.getElementById('request-text').value = '';
+            
+            // МОМЕНТАЛЬНЫЙ ОТРЕНДЕР БЕЗ ПЕРЕЗАГРУЗКИ СТРАНИЦЫ
+            renderLocalTickets();
+
+            // Симуляция автоответа менеджера через 3 секунды
+            setTimeout(function() {
+                let updatedTickets = JSON.parse(localStorage.getItem('am_demo_page_tickets') || '[]');
+                if (updatedTickets.length > 0) {
+                    let managerAnswer = "Ваш запрос принят главным менеджером АвтоМаркета. Свяжемся с вами по телефону в ближайшее время.";
+                    if (subject.includes("подборе")) {
+                        managerAnswer = "Запрос передан в технический отдел подбора кросс-кодов. Пожалуйста, ожидайте, менеджер уже проверяет спецификации по вашему авто.";
+                    } else if (subject.includes("балансу")) {
+                        managerAnswer = "Запрос по API взаиморасчетов зарегистрирован. Финансовый отдел проводит сверку платежей по закрывающим документам.";
+                    }
+                    
+                    const targetIndex = updatedTickets.findIndex(t => t.id === newTicket.id);
+                    if (targetIndex !== -1) {
+                        updatedTickets[targetIndex].answer = managerAnswer;
+                    }
+                    localStorage.setItem('am_demo_page_tickets', JSON.stringify(updatedTickets));
+                    
+                    // ЕЩЕ ОДИН ЖИВОЙ ОТРЕНДЕР ПРИ ОТВЕТЕ
+                    renderLocalTickets();
+                }
+            }, 3000);
+        }
+
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ЖИВОЙ ФИЛЬТРАЦИИ И ПОИСКА ПО СЛОВАМ
+        function renderLocalTickets() {
+            const container = document.getElementById('tickets-history-container');
+            if (!container) return;
+
+            const tickets = JSON.parse(localStorage.getItem('am_demo_page_tickets') || '[]');
+            
+            const selectedSubject = document.getElementById('filter-subject').value;
+            const searchQuery = document.getElementById('filter-search').value.trim().toLowerCase();
+
+            // Фильтрация
+            const filteredTickets = tickets.filter(t => {
+                const matchSubject = (selectedSubject === 'all' || t.subject === selectedSubject);
+                const matchSearch = t.text.toLowerCase().includes(searchQuery) || 
+                                    t.subject.toLowerCase().includes(searchQuery) || 
+                                    t.id.toLowerCase().includes(searchQuery);
+                return matchSubject && matchSearch;
+            });
+
+            // Если список пуст
+            if (filteredTickets.length === 0) {
+                let emptyMsg = "У вас пока нет активных обращений к менеджеру.";
+                if (tickets.length > 0) {
+                    emptyMsg = "Обращений с такими параметрами фильтрации не найдено.";
+                }
+                container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding-top: 50px;">${emptyMsg}</div>`;
+                return;
+            }
+
+            // Рендерим отфильтрованные данные
+            let html = '';
+            filteredTickets.forEach(t => {
+                let answerHtml = '';
+                if (t.answer) {
+                    answerHtml = `
+                        <div style="font-size:12px; font-weight:700; color:#16a34a; margin-bottom:2px;">👨‍💼 Ответ менеджера:</div>
+                        <div style="font-size:13px; color:#15803d; font-style:italic;">${t.answer}</div>
+                    `;
+                } else {
+                    answerHtml = `
+                        <div style="font-size:12px; color:#d97706; font-weight:600; display:flex; align-items:center; gap:5px;">
+                            <span style="display:inline-block; width:6px; height:6px; background:#d97706; border-radius:50%;"></span> 
+                            Ожидание ответа менеджера...
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; position: relative; margin-bottom: 10px;">
+                        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px;">
+                            <span style="color:#ea580c; font-weight:700;">${t.id}</span>
+                            <span style="color:#64748b;">Сегодня в ${t.date}</span>
+                        </div>
+                        <div style="font-size:13px; font-weight:600; color:#0f172a; margin-bottom:4px;">Тема: ${t.subject}</div>
+                        <div style="font-size:14px; color:#334155; background:#ffffff; padding:8px; border-radius:6px; border:1px solid #f1f5f9; word-break: break-word;">${t.text}</div>
+                        
+                        <div style="margin-top:12px; padding-top:10px; border-top:1px dashed #e2e8f0;">
+                            ${answerHtml}
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function handleLogout(event) {
+            event.preventDefault();
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

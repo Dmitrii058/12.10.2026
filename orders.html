@@ -1,0 +1,384 @@
+<head>
+    <meta charset="UTF-8">
+    <title>АвтоМаркет — Мои Заказы</title>
+    
+    <!-- СЛУЖЕБНЫЙ ЗАЩИТНЫЙ СКРИПТ: БЕЗОПАСНЫЙ ПЕРЕХОД И ИСПРАВЛЕНИЕ СБОЕВ СЕССИИ -->
+    <script>
+        (function() {
+            let currentRole = localStorage.getItem('am_user_role');
+            let currentUser = localStorage.getItem('am_user_name');
+
+            // Страховка сессии: если вход выполнен под Иваном, принудительно восстанавливаем ключи
+            if (localStorage.getItem('am_user_email') === '123456@mail.ru') {
+                if (!currentRole || currentRole === 'guest') {
+                    localStorage.setItem('am_user_role', 'client');
+                    currentRole = 'client';
+                }
+                if (!currentUser) {
+                    localStorage.setItem('am_user_name', 'Иван Иванович');
+                    localStorage.setItem('am_user_balance', '45200');
+                }
+            }
+
+            // Блокировка: если это обычный гость без логина — отправляем на index.html
+            if (!currentRole || currentRole === 'guest') {
+                alert("Доступ заблокирован! Пожалуйста, сначала войдите в систему.");
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Локальные стили для статусов снабжения закупщика */
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .status-created { background: #ffedd5; color: #ea580c; }
+        .status-shipping { background: #dbeafe; color: #0c56ea; }
+        .status-ready { background: #dcfce7; color: #16a34a; }
+        .status-cancel { background: #fee2e2; color: #ef4444; }
+        
+        .search-btn { color: white; border: none; border-radius: 6px; font-weight: bold; transition: opacity 0.2s; }
+        .search-btn:hover { opacity: 0.9; }
+        
+        /* >>> ВОТ ЭТИ ДВЕ СТРОКИ (37 и 38) НАДО ЗАМЕНИТЬ <<< */
+        .sub-table th, .schedule-table th, .sub-table td, .schedule-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        .sub-table th, .schedule-table th { background: #ea580c !important; color: #ffffff !important; font-weight: 700; }
+    </style>
+</head>
+<body style="background-color: #f8fafc; margin: 0; padding: 0;">
+
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ ПО ГОРИЗОНТАЛИ -->
+    <header class="main-header" style="background: none; border: none; box-shadow: none; position: relative; z-index: 100;">
+        <div class="header-top">
+            
+            <!-- ЛОГОТИП АВТОМАРКЕТ -->
+            <a href="glavnaya.html" class="logo" style="font-size: 22px; white-space: nowrap; margin-right: 25px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span style="font-weight: 800; letter-spacing: -0.5px; color: #000000;">Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+            <!-- ВЫБОР ГОРОДА -->
+            <div class="city-select">
+                <span>Город: </span>
+                <select id="header-city-select">
+                    <option value="Москва">Москва</option>
+                    <option value="Пенза">Пенза</option>
+                    <option value="Санкт-Петербург">Санкт-Петербург</option>
+                </select>
+            </div>
+
+            <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ -->
+            <nav class="main-nav" style="margin-right: auto;">
+                <a href="glavnaya.html" class="nav-link">Главная</a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Каталоги ▾</div>
+                    <div class="dropdown-content">
+                        <a href="catalog.html">Оригинальный каталог</a>
+                        <a href="china_catalog.html">Китайский каталог</a>
+                        <a href="replacements_catalog.html">Каталог заменителей</a>
+                        <a href="tyres_catalog.html">Каталог шин и дисков</a>
+                        <a href="lamps_catalog.html">Автолампы</a>
+                        <a href="garage.html">Гараж</a>
+                    </div>
+                </div>
+
+                <!-- КОРЗИНА -->
+                <a href="cart.html" class="nav-link" id="nav-cart-link">Корзина <span id="cart-counter" style="background: #ea580c; color: white; padding: 2px 7px; border-radius: 20px; font-size: 12px; margin-left: 3px; display: none;">0</span></a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Заказы ▾</div>
+                    <div class="dropdown-content">
+                        <a href="orders.html?action=view">Заказы</a>
+                        <a href="returns.html">Оформление возвратов</a>
+                        <a href="claims.html">Оформление рекламаций</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Взаиморасчеты ▾</div>
+                    <div class="dropdown-content">
+                        <a href="sales.html">Продажи (Архив сделок)</a>
+                        <a href="finance.html">Финансы</a>
+                        <a href="schedule.html">График расчетов</a>
+                    </div>
+                </div>
+
+                <a href="profile.html" class="nav-link">Личные данные</a>
+                <a href="qrcode.html" class="nav-link">Оплата по QR</a>
+            </nav>
+                        
+            <!-- ДИНАМИЧЕСКИЙ БЛОК ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ -->
+            <div class="user-menu" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; line-height: 1.3; padding: 4px 0; font-size: 14px; white-space: nowrap;">
+                <a href="profile.html" id="nav-user-greeting" style="font-weight: 600; color: #0c56ea; text-decoration: none; cursor: pointer;">Загрузка...</a>
+                <div style="font-weight: 600; color: #000000;">
+                    Баланс: <span style="color: #16a34a;" id="nav-user-balance">0 ₽</span>
+                </div>
+                <a href="#" onclick="handleLogout(event)" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: bold; margin-top: 2px;">Выход</a>
+            </div>
+        </div>
+    </header>
+    <div class="container" style="width: 92%; max-width: 1400px; margin-left: auto; margin-right: auto; margin-top: 30px; box-sizing: border-box;">
+        
+        <!-- ЭКРАН 1: СВОДНЫЙ СПИСОК ЗАКАЗОВ КЛИЕНТА -->
+        <div id="orders-list-screen" style="background: #ffffff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);">
+            <h2 style="margin: 0 0 20px 0; font-size: 22px; font-weight: 700;">История ваших заказов</h2>
+            <div class="table-responsive">
+                <table class="schedule-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #e2e8f0; background: #f8fafc; color: #475569;">
+                            <th style="padding: 12px; width: 220px;">Номер заказа (ID Сделки)</th>
+                            <th style="padding: 12px; width: 180px;">Дата создания заказа</th>
+                            <th style="padding: 12px; text-align: right; width: 180px;">Сумма заказа</th>
+                            <th style="padding: 12px; text-align: center; width: 200px;">Статус снабжения</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-list-body">
+                        <!-- Все строки заказов (включая отгруженные и отмененные) генерируются через JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+         <!-- ЭКРАН 2: РАЗВЕРНУТЫЙ ПРОСМОТР АРТИКУЛОВ ВНУТРИ ВЫБРАННОГО ЗАКАЗА -->
+         <div id="order-details-screen" style="display: none; background: #ffffff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);">
+            
+            <!-- ПАНЕЛЬ КНОПОК ВОЗВРАТА И УПРАВЛЕНИЯ ПОЗИЦИЯМИ -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                <button class="search-btn" onclick="closeOrderDetails()" style="background-color: #64748b; cursor: pointer; padding: 10px 20px;">
+                    ← Назад к списку заказов
+                </button>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="bulkProcessItems('Отгрузить')" style="background-color: #16a34a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; padding: 10px 20px;">
+                        📦 Отгрузить выбранные артикулы
+                    </button>
+                    <button onclick="bulkProcessItems('Отменить')" style="background-color: #ef4444; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; padding: 10px 20px;">
+                        🚫 Отменить / Рекламация
+                    </button>
+                </div>
+            </div>
+            
+            <!-- ШАПКА ВЫБРАННОЙ СДЕЛКИ -->
+            <div style="padding: 15px 20px; background: #fffaf5; border-radius: 8px; border: 1px solid #ffedd5; text-align: left; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #0f172a; font-size: 18px;">Просмотр состава сделки: <span id="detail-order-title-id" style="color: #ea580c; font-weight: bold;"></span></h3>
+            </div>
+
+            <!-- ИНТЕРАКТИВНАЯ ТАБЛИЦА СПИСКА АРТИКУЛОВ С ГАЛОЧКАМИ -->
+            <div class="table-responsive">
+                <table class="sub-table" style="width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 20px;">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px; text-align: center;"><input type="checkbox" id="master-sub-checkbox" checked onclick="toggleAllSubItems(this)" style="cursor: pointer;"></th>
+                            <th style="width: 180px;">Заводской артикул</th>
+                            <th>Наименование детали / Бренд</th>
+                            <th style="width: 180px; text-align: center;">Статус товара</th>
+                            <th style="width: 150px; text-align: right;">Сумма</th>
+                        </tr>
+                    </thead>
+                    <tbody id="order-sub-items-body">
+                        <!-- Строки запчастей вставляются скриптом из LocalStorage -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div> <!-- /container -->
+
+    <footer style="text-align: center; padding: 20px; color: #64748b; font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 60px;">
+        <p>&copy; 2026 АвтоМаркет. Все права защищены.</p>
+    </footer>
+      <!-- СИНХРОНИЗАЦИЯ С ЕДИНЫМ ХРАНИЛИЩЕМ DATABASE.JS -->
+      <script>
+        let currentActiveOrderID = "";
+
+        function getGlobalDatabase() {
+            const defaultDatabase = {
+                "123456@mail.ru": {
+                    name: "Иван Иванович",
+                    phone: "+7 (999) 111-22-33",
+                    balance: 45200,
+                    password: "123456",
+                    city: "Москва",
+                    tickets: [],
+                    orders: [
+                        { id: "AM-785112", title: "Фильтр масляный MANN-FILTER", article: "W 610/3", price: 850, status: "Создан", date: "12.10.2026" },
+                        { id: "AM-785113", title: "Колодки передние Brembo", article: "P 85 020", price: 2000, status: "К отгрузке", date: "11.10.2026" }
+                    ]
+                }
+            };
+            if (!localStorage.getItem('am_global_contractors_db')) {
+                localStorage.setItem('am_global_contractors_db', JSON.stringify(defaultDatabase));
+            }
+            return JSON.parse(localStorage.getItem('am_global_contractors_db'));
+        }
+
+        function saveGlobalDatabase(db) {
+            localStorage.setItem('am_global_contractors_db', JSON.stringify(db));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const greetingElement = document.getElementById('nav-user-greeting');
+            const balanceElement = document.getElementById('nav-user-balance');
+            const citySelector = document.getElementById('header-city-select');
+
+            const userName = localStorage.getItem('am_user_name') || 'Иван Иванович';
+            const userBalance = localStorage.getItem('am_user_balance') || '45200';
+
+            if (greetingElement) greetingElement.textContent = `Добрый день, ${userName}!`;
+            if (balanceElement) balanceElement.textContent = `${parseInt(userBalance).toLocaleString('ru-RU')} ₽`;
+
+            if (citySelector) {
+                const savedCity = localStorage.getItem('selectedCity') || 'Москва';
+                citySelector.value = savedCity;
+                citySelector.addEventListener('change', (e) => {
+                    localStorage.setItem('selectedCity', e.target.value);
+                });
+            }
+
+            // Включаем оранжевый счетчик корзины
+            const counter = document.getElementById('cart-counter');
+            if (counter) { counter.textContent = "2"; counter.style.display = "inline-block"; }
+
+            renderOrdersMainTable();
+        });
+
+        // ИСПРАВЛЕНО: Теперь рендерит АБСОЛЮТНО ВСЕ ЗАКАЗЫ (не удаляет отгруженные и отмененные)
+        function renderOrdersMainTable() {
+            const tbody = document.getElementById('orders-list-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const userEmail = localStorage.getItem('am_user_email') || '123456@mail.ru';
+            const db = getGlobalDatabase();
+            const activeClient = db[userEmail];
+            const allOrders = activeClient?.orders || [];
+
+            if (allOrders.length > 0) {
+                allOrders.forEach(order => {
+                    const tr = document.createElement('tr');
+                    tr.style.borderBottom = "1px solid #e2e8f0";
+                    tr.style.cursor = "pointer";
+                    tr.onclick = () => openOrderDetails(order.id);
+
+                    let badgeClass = 'status-created';
+                    if (order.status === 'К отгрузке') badgeClass = 'status-shipping';
+                    else if (order.status === 'Выдан' || order.status === 'Отгружен') badgeClass = 'status-ready';
+                    else if (order.status === 'Отменен') badgeClass = 'status-cancel';
+
+                    tr.innerHTML = `
+                        <td style="padding: 12px; color: #ea580c; font-weight: bold;">${order.id}</td>
+                        <td style="padding: 12px; color: #475569; font-weight: 600;">${order.date || '12.10.2026'}</td>
+                        <td style="padding: 12px; text-align: right; font-weight: 700; color: #0f172a;">${order.price.toLocaleString()} ₽</td>
+                        <td style="padding: 12px; text-align: center;"><span class="status-badge ${badgeClass}">${order.status}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="4" style="padding: 30px; text-align: center; color: #94a3b8; font-weight: 600;">Активных сделок в снабжении не найдено.</td></tr>`;
+            }
+        }
+
+        function openOrderDetails(orderID) {
+            currentActiveOrderID = orderID;
+            document.getElementById('detail-order-title-id').textContent = orderID;
+            
+            const subTbody = document.getElementById('order-sub-items-body');
+            if (!subTbody) return;
+            subTbody.innerHTML = '';
+
+            const userEmail = localStorage.getItem('am_user_email') || '123456@mail.ru';
+            const db = getGlobalDatabase();
+            const orderData = db[userEmail].orders.find(o => o.id === orderID);
+
+            if (orderData) {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = "1px solid #e2e8f0";
+                
+                let subStatusText = "На складе";
+                let badgeClass = "status-created";
+
+                if (orderData.status === "К отгрузке") { subStatusText = "В пути"; badgeClass = "status-shipping"; }
+                else if (orderData.status === "Выдан" || orderData.status === "Отгружен") { subStatusText = "Выдан клиенту"; badgeClass = "status-ready"; }
+                else if (orderData.status === "Отменен") { subStatusText = "Сделка аннулирована"; badgeClass = "status-cancel"; }
+
+                tr.innerHTML = `
+                    <td style="text-align: center;"><input type="checkbox" class="sub-item-checkbox" checked style="cursor: pointer;"></td>
+                    <td style="font-family: monospace; font-weight: bold; color: #ea580c;">${orderData.article}</td>
+                    <td style="font-weight: 600; color: #000000;">${orderData.title}</td>
+                    <td style="text-align: center;"><span class="status-badge ${badgeClass}">${subStatusText}</span></td>
+                    <td style="text-align: right; font-weight: 700; color: #0f172a;">${orderData.price.toLocaleString()} ₽</td>
+                `;
+                subTbody.appendChild(tr);
+            }
+
+            document.getElementById('orders-list-screen').style.display = 'none';
+            document.getElementById('order-details-screen').style.display = 'block';
+        }
+
+        function toggleAllSubItems(master) {
+            document.querySelectorAll('.sub-item-checkbox').forEach(cb => cb.checked = master.checked);
+        }
+
+        // ИСПРАВЛЕНО: Меняет статус на месте и не удаляет строку из DOM-таблицы
+        function bulkProcessItems(actionType) {
+            const selectedCheckboxes = document.querySelectorAll('.sub-item-checkbox:checked');
+            if (selectedCheckboxes.length === 0) {
+                alert('Пожалуйста, отметьте галочками позиции для выполнения операции!');
+                return;
+            }
+
+            const userEmail = localStorage.getItem('am_user_email') || '123456@mail.ru';
+            const userName = localStorage.getItem('am_user_name') || 'Иван Иванович';
+            let db = getGlobalDatabase();
+            const orderIndex = db[userEmail].orders.findIndex(o => o.id === currentActiveOrderID);
+
+            if (orderIndex !== -1) {
+                const orderData = db[userEmail].orders[orderIndex];
+
+                if (actionType === 'Отгрузить') {
+                    // Ставим статус Выдан (он останется на экране, но обновит цвет бэджа на зеленый)
+                    db[userEmail].orders[orderIndex].status = "Выдан";
+
+                    // Дублируем запись в архив продаж sales.html
+                    let archiveSales = JSON.parse(localStorage.getItem('am_sales_archive')) || [];
+                    const newSaleRecord = {
+                        date: new Date().toLocaleDateString('ru-RU'),
+                        id: orderData.id,
+                        client: userName,
+                        title: orderData.title,
+                        article: orderData.article,
+                        price: orderData.price,
+                        status: "Отгружен"
+                    };
+                    archiveSales.unshift(newSaleRecord);
+                    localStorage.setItem('am_sales_archive', JSON.stringify(archiveSales));
+
+                    alert(`📦 Статус изменен на "Выдан"! Позиция успешно зафиксирована в истории заказов и отправлена в архив продаж «sales.html».`);
+                } else if (actionType === 'Отменить') {
+                    // Ставим статус Отменен (останется на экране, бэдж станет красным)
+                    db[userEmail].orders[orderIndex].status = "Отменен";
+                    alert(`🚫 Статус изменен на "Отменен". Сделка успешно аннулирована в истории снабжения.`);
+                }
+
+                saveGlobalDatabase(db);
+                closeOrderDetails();
+                renderOrdersMainTable();
+            }
+        }
+
+        function closeOrderDetails() {
+            document.getElementById('order-details-screen').style.display = 'none';
+            document.getElementById('orders-list-screen').style.display = 'block';
+        }
+
+        function handleLogout(e) {
+            e.preventDefault();
+            localStorage.setItem('am_user_role', 'guest');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

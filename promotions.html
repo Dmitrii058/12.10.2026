@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>АвтоМаркет — Актуальные акции</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ -->
+    <header class="main-header" style="background: none; border: none; box-shadow: none;">
+        <div class="header-top">
+            <a href="glavnaya.html" class="logo" style="font-size: 22px; white-space: nowrap; margin-right: 25px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span style="font-weight: 800; letter-spacing: -0.5px; color: #000000;">Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+            <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ (УНИВЕРСАЛЬНОЕ СКВОЗНОЕ С ПРОФИЛЕМ) -->
+            <nav class="main-nav" style="margin-right: auto;">
+                <a href="glavnaya.html" class="nav-link">Главная</a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Каталоги ▾</div>
+                    <div class="dropdown-content">
+                        <a href="catalog.html">Оригинальный каталог</a>
+                        <a href="china_catalog.html">Китайский каталог</a>
+                        <a href="replacements_catalog.html">Каталог заменителей</a>
+                        <a href="tyres_catalog.html">Каталог шин и дисков</a>
+                        <a href="lamps_catalog.html">Автолампы</a>
+                        <a href="garage.html">Гараж</a>
+                    </div>
+                </div>
+
+                <!-- КОРЗИНА: Сохранен оранжевый кругляшок-счётчик количества товаров -->
+                <a href="cart.html" class="nav-link" id="nav-cart-link">Корзина <span id="cart-counter" style="background: #ea580c; color: white; padding: 2px 7px; border-radius: 20px; font-size: 12px; margin-left: 3px; display: none;">0</span></a>
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Заказы ▾</div>
+                    <div class="dropdown-content">
+                        <a href="orders.html?action=view">Заказы</a>
+                        <a href="returns.html">Оформление возвратов</a>
+                        <a href="claims.html">Оформление рекламаций</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Взаиморасчеты ▾</div>
+                    <div class="dropdown-content">
+                        <a href="sales.html">Продажи (Архив сделок)</a>
+                        <a href="finance.html">Финансы</a>
+                        <a href="schedule.html">График расчетов</a>
+                    </div>
+                </div>
+
+                <!-- ИСПРАВЛЕНО И ДОБАВЛЕНО: Сквозная ссылка на Личный профиль (Карточку клиента) -->
+                <a href="profile.html" class="nav-link">Личные данные</a>
+
+                <a href="qrcode.html" class="nav-link">Оплата по QR</a>
+            </nav>
+            <div class="user-menu" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; line-height: 1.3; padding: 4px 0; font-size: 14px; white-space: nowrap;">
+                <!-- ИСПРАВЛЕНО: Теперь это ссылка на профиль во всех файлах -->
+                <a href="profile.html" id="nav-user-greeting" style="font-weight: 600; color: #0c56ea; text-decoration: none; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#0c56ea'">Загрузка...</a>
+                <div style="font-weight: 600; color: #000000;">
+                    Баланс: <span style="color: #16a34a;" id="nav-user-balance">0 ₽</span>
+                </div>
+                <a href="#" onclick="handleLogout(event)" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: bold; margin-top: 2px;">Выход</a>
+            </div>
+
+    </div> <!-- ЗАКРЫВАЕТСЯ КОНТЕЙНЕР ШАПКИ HEADER-TOP -->
+</header>
+
+
+    <div class="container">
+        <div class="schedule-card" style="margin-bottom: 40px;">
+            <h2>🔥 Актуальные акции и спецпредложения</h2>
+            <p style="color: #64748b; margin-top: -5px; margin-bottom: 30px;">
+                Успейте воспользоваться выгодными сезонными предложениями от складов-партнеров «АвтоМаркета».
+            </p>
+
+            <!-- СЕТКА ДЛЯ АКЦИЙ -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                
+                <!-- Акция 1 -->
+                <div class="orange-muted-card" style="border-left: 5px solid #ea0c0c;">
+                    <div class="card-title" style="color: #ea0c0c !important; font-weight: 700;">
+                        <span class="card-icon">🛢️</span> Сезонное ТО: Скидка 15% на масла и фильтры
+                    </div>
+                    <p class="card-text" style="margin-top: 8px;">
+                        При единовременном заказе любого оригинального моторного масла объемом от 4л и комплекта фильтров (масляный + воздушный), вы получаете гарантированную скидку 15% на позиции в корзине.
+                    </p>
+                    <p class="card-subtext" style="margin-top: 5px; font-weight: 600; color: #64748b;">*Срок действия: до конца текущей недели.</p>
+                </div>
+
+                <!-- Акция 2 -->
+                <div class="orange-muted-card" style="border-left: 5px solid #0c56ea;">
+                    <div class="card-title" style="color: #0c56ea !important; font-weight: 700;">
+                        <span class="card-icon">❄️</span> Готовимся к зиме: Щетки стеклоочистителя 2+1
+                    </div>
+                    <p class="card-text" style="margin-top: 8px;">
+                        Покупайте две любые щетки стеклоочистителя (дворники) брендов Bosch, Denso или LynxAuto, и получайте третью щетку (или зимнюю жидкость стеклоомывателя -50°C) в подарок!
+                    </p>
+                    <p class="card-subtext" style="margin-top: 5px; font-weight: 600; color: #64748b;">*Акция распространяется на розничные и оптовые заказы.</p>
+                </div>
+
+                <!-- Акция 3 -->
+                <div class="orange-muted-card" style="border-left: 5px solid #16a34a;">
+                    <div class="card-title" style="color: #16a34a !important; font-weight: 700;">
+                        <span class="card-icon">⚡</span> Кэшбэк 5% за оплату по QR-коду (СБП)
+                    </div>
+                    <p class="card-text" style="margin-top: 8px;">
+                        Оплачивайте задолженности или новые заказы в разделе «Оплата по QR» через систему быстрых платежей. 5% от суммы платежа вернутся на ваш баланс личного кабинета в течение 24 часов.
+                    </p>
+                    <p class="card-subtext" style="margin-top: 5px; font-weight: 600; color: #64748b;">*Сумма кэшбэка не ограничена.</p>
+                </div>
+
+                <!-- Акция 4 -->
+                <div class="orange-muted-card" style="border-left: 5px solid #ea580c;">
+                    <div class="card-title" style="color: #ea580c !important; font-weight: 700;">
+                        <span class="card-icon">🇨🇳</span> Распродажа подвески: Поднебесная на связи!
+                    </div>
+                    <p class="card-text" style="margin-top: 8px;">
+                        Снижение цен до 20% на элементы ходовой части и рулевого управления (рычаги, амортизаторы, наконечники) из нашего «Китайского каталога». Высокое фабричное качество от проверенных брендов.
+                    </p>
+                    <p class="card-subtext" style="margin-top: 5px; font-weight: 600; color: #64748b;">*Все детали имеют официальные сертификаты соответствия.</p>
+                </div>
+
+                <!-- Акция 5 -->
+                <div class="orange-muted-card" style="border-left: 5px solid #7c3aed;">
+                    <div class="card-title" style="color: #7c3aed !important; font-weight: 700;">
+                        <span class="card-icon">🚚</span> Ночной Экспресс: Бесплатная доставка до СТО
+                    </div>
+                    <p class="card-text" style="margin-top: 8px;">
+                        Оформите заказ на любые детали из каталогов заменителей в промежуток с 21:00 до 06:00, и мы доставим их на ваш автосервис к 09:00 утра абсолютно бесплатно (независимо от суммы заказа).
+                    </p>
+                    <p class="card-subtext" style="margin-top: 5px; font-weight: 600; color: #64748b;">*Действует для городов: Москва, Пенза, Санкт-Петербург.</p>
+                </div>
+
+            </div>
+            
+            <div style="margin-top: 30px; text-align: right;">
+                <a href="glavnaya.html" class="btn" style="background: #475569; text-decoration: none; padding: 10px 20px; color: white; border-radius: 6px; font-weight: 600; display: inline-block;">Вернуться на главную</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedName = localStorage.getItem('am_user_name');
+            const savedLogin = localStorage.getItem('am_user_login') || '123456@mail.ru';
+            const savedBalance = localStorage.getItem('am_user_balance') || '45200';
+
+            const greetingEl = document.getElementById('nav-user-greeting');
+            const balanceEl = document.getElementById('nav-user-balance');
+
+            if (greetingEl && balanceEl) {
+                if (savedName && savedName.trim() !== '') {
+                    greetingEl.innerText = `Добрый день, ${savedName}!`;
+                } else {
+                    greetingEl.innerText = `Добро пожаловать, ${savedLogin}`;
+                }
+                balanceEl.innerText = parseInt(savedBalance).toLocaleString('ru-RU') + ' ₽';
+            }
+        });
+
+        function handleLogout(event) {
+            event.preventDefault();
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

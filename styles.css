@@ -1,0 +1,2221 @@
+/* ==========================================================================
+   1. ГЛОБАЛЬНЫЕ НАСТРОЙКИ И ПЕРЕМЕННЫЕ
+   ========================================================================== */
+   @import url('https://googleapis.com');
+
+   :root {
+       --bg-dark: #ffffff;          /* Общий белый фон платформы */
+       --bg-card: #f8fafc;          /* Мягкий серый фон для внутренних блоков */
+       --bg-input: #f1f5f9;         /* Базовый фон инпутов */
+       --text-main: #0f172a;        /* Темный основной текст */
+       --text-muted: #64748b;       /* Серый второстепенный текст */
+       --accent: #2563eb;           /* Насыщенный синий для кнопок и ссылок */
+       --accent-hover: #1d4ed8;     
+       --brand-orange: #ea580c;     /* Фирменный оранжевый */
+       --success: #16a34a;          
+       --danger: #dc2626;           
+       --warning: #d97706;          
+       --border-color: #e2e8f0;     /* Границы светлой темы */
+       --radius: 12px;              
+       --transition: all 0.2s ease-in-out;
+   }
+   
+   * {
+       margin: 0;
+       padding: 0;
+       box-sizing: border-box;
+   }
+   
+   body {
+       font-family: 'Inter', sans-serif;
+       background-color: var(--bg-dark);
+       color: var(--text-main);
+       line-height: 1.6;
+       padding-bottom: 60px;
+   }
+   
+   .container {
+       width: 92%;
+       max-width: 1400px;
+       margin: 20px auto 0 auto;
+   }
+   
+  /* ==========================================================================
+   2. ШАПКА САЙТА И ПАРЯЩАЯ ОРАНЖЕВАЯ ПАНЕЛЬ МЕНЮ (ЦВЕТ СДЕЛАН ПООРАНЖЕВЕЕ)
+   ========================================================================== */
+.main-header {
+    background: none; 
+    border: none; 
+    box-shadow: none;
+}
+
+.main-header .header-top {
+    background-color: rgba(241, 165, 103, 0.4) !important;
+    border: 2px solid rgba(234, 88, 12, 0.6) !important;
+    border-radius: 40px !important; 
+    padding: 10px 25px !important; 
+    margin: 10px 15px !important; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between !important; 
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.08) !important;
+    flex-wrap: nowrap !important; /* ИСПРАВЛЕНО: Запрещаем перенос строк внутри шапки */
+}
+
+.logo {
+    font-size: 20px; 
+    white-space: nowrap; 
+    margin-right: 25px; 
+    display: flex; 
+    align-items: center;
+    flex-shrink: 0; /* ИСПРАВЛЕНО: Защищаем логотип от сжатия */
+}
+
+.logo span {
+    font-weight: 700;
+    color: #000000;
+}
+
+/* ИСПРАВЛЕНО: Полностью переработан контейнер города для защиты от сжатия навигацией */
+.city-select {
+    display: flex !important;          
+    visibility: visible !important;     
+    opacity: 1 !important;              
+    align-items: center !important;
+    gap: 6px !important;
+    margin-right: 20px !important;      
+    white-space: nowrap !important;     
+    flex-shrink: 0 !important; /* ГЛАВНОЕ ИСПРАВЛЕНИЕ: Не дает навигации сжимать этот блок в 0 */
+}
+
+.city-select span {
+    font-weight: 600;
+    color: #000000;
+    font-size: 14px;
+}
+
+.city-select select {
+    border-radius: 20px; 
+    padding: 4px 12px; 
+    border: 1px solid rgba(9, 9, 9, 0.6); 
+    color: #090909; /* Сделали текст города фирменным оранжевым */
+    background-color: #ffffff;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+}
+
+/* Навигационные ссылки главного меню */
+.main-nav {
+    display: flex !important; 
+    gap: 10px !important; 
+    align-items: center !important;
+    flex-grow: 1 !important; 
+    justify-content: center !important; 
+    /* ИСПРАВЛЕНО: Убрали overflow: hidden, чтобы выпадающие списки могли показываться */
+}
+
+.main-header .main-nav .nav-link,
+.main-header .main-nav .nav-label {
+    color: #000000 !important;
+    font-weight: 600;
+    display: flex;       
+    align-items: center; 
+    height: 100%;        
+    padding: 10px 12px; 
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px; /* Чуть уменьшили шрифт, чтобы уместить все 7 вкладок на ноутбуках */
+    white-space: nowrap;
+}
+
+.main-header .main-nav .nav-label {
+    cursor: pointer; /* Изменили на pointer, так как это раскрывающееся меню */
+    user-select: none;
+}
+
+.main-header .main-nav .nav-link.active {
+    color: var(--accent) !important; 
+}
+
+.main-header .main-nav .nav-link:hover,
+.dropdown:hover .nav-label {
+    color: var(--brand-orange) !important; /* Изменили синий ховер на ваш фирменный оранжевый */
+}
+
+/* Меню пользователя справа */
+.user-menu {
+    font-size: 14px; 
+    white-space: nowrap; 
+    margin-left: 20px; 
+    display: flex; 
+    align-items: center; 
+    color: #000000;
+    flex-shrink: 0; /* ИСПРАВЛЕНО: Защищаем профиль от сжатия */
+}
+
+.user-menu a {
+    text-decoration: none;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+   
+   .manager-link {
+       font-weight: 500; 
+       color: var(--accent);
+   }
+   
+   .logout-link {
+       color: var(--danger);
+   }
+   
+   /* ==========================================================================
+      3. КОМФОРТНЫЕ ВЫПАДАЮЩИЕ СПИСКИ С БОЛЬШОЙ ОБЛАСТЬЮ НАВЕДЕНИЯ
+      ========================================================================== */
+   .dropdown {
+       position: relative;
+       display: inline-block;       
+       padding-bottom: 10px; 
+       margin-bottom: -10px;
+   }
+   
+   .dropdown:hover .dropdown-content {
+       display: block !important;
+   }
+   
+   .dropdown-content {
+       display: none !important; 
+       position: absolute;
+       top: 100%;
+       left: 0;
+       background-color: #ffffff !important;
+       min-width: 310px; 
+       box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.18) !important;
+       border: 1.5px solid #fdba74 !important; 
+       border-radius: 14px !important;
+       padding: 6px 0 !important;
+       z-index: 99999 !important; 
+       margin-top: -2px; 
+       overflow: hidden;
+   }
+   
+   .dropdown-content a {
+       color: #000000 !important;
+       padding: 14px 20px !important; 
+       text-decoration: none !important;
+       display: block !important;
+       font-size: 15px !important; 
+       font-weight: 500 !important;
+       line-height: 1.4 !important;
+       text-align: left !important;
+       border-radius: 0 !important;
+       background: none !important;
+       transition: all 0.15s ease-in-out !important;
+   }
+   
+   .dropdown-content a:hover {
+       background-color: rgba(234, 88, 12, 0.09) !important; 
+       color: #ea580c !important; 
+       padding-left: 26px !important; 
+   }
+   
+   /* ==========================================================================
+      4. БЛОКИ КОНТЕНТА, ПОИСК И ДЕКОРАТИВНЫЕ КАРТОЧКИ
+      ========================================================================== */
+   /* Баннер ошибки */
+  
+   
+   /* Приветствие */
+   .welcome-section {
+    background: #fef2f2;
+    color: #ea580c;
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 25px; /* Убрали дублирующийся margin-bottom: 30px */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Все свойства border удалены */
+}
+   
+   .welcome-section h2 {
+       font-size: 26px;
+   }
+   
+   .welcome-section p {
+       margin-top: 5px; 
+       color: var(--text-muted);
+   }
+   
+   /* Блок поиска запчастей */
+   .search-section {
+       background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+       padding: 30px 20px; 
+       margin-bottom: 25px;
+       border-radius: var(--radius);
+       border: 1px solid var(--border-color);
+       text-align: center;
+       box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+   }
+   
+   .search-section h3 {
+       margin-bottom: 15px; 
+       font-size: 20px; 
+       color: #000000;
+   }
+   
+   .search-container {
+       display: flex;
+       max-width: 100%; 
+       width: 100%; 
+       margin: 0;
+       gap: 10px;
+   }
+   
+   .custom-search-input {
+       flex: 1;
+       background-color: rgba(249, 115, 22, 0.02) !important;
+       border: 2px solid #fdba74 !important; 
+       padding: 15px 20px;
+       border-radius: var(--radius);
+       color: #000000 !important;
+       font-size: 16px;
+       transition: all 0.25s ease-in-out !important;
+   }
+   
+   .custom-search-input:hover, 
+   .custom-search-input:focus {
+       outline: none;
+       background-color: #ffffff !important;
+       border-color: #ea580c !important; 
+       box-shadow: 0 0 12px rgba(234, 88, 12, 0.25) !important;
+   }
+   
+   .search-btn {
+       background-color: var(--brand-orange);
+       color: white;
+       border: none;
+       padding: 0 30px;
+       border-radius: var(--radius);
+       font-size: 16px;
+       font-weight: 600;
+       cursor: pointer;
+       transition: var(--transition);
+   }
+   
+   .search-btn:hover {
+       background-color: #c2410c;
+   }
+   
+   /* ==========================================================================
+      5. ТАБЛИЦЫ ДАННЫХ (ГАРАЖ)
+      ========================================================================== */
+   .garage-container {
+       margin-bottom: 35px;
+   }
+   
+   .garage-container h3 {
+       margin-bottom: 15px; 
+       font-size: 20px; 
+       display: flex; 
+       align-items: center; 
+       gap: 10px;
+   }
+   
+   .table-responsive {
+       width: 100%;
+       overflow-x: auto;
+       background-color: var(--bg-dark);
+       border: 1px solid var(--border-color);
+       border-radius: var(--radius);
+       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+   }
+   
+   .data-table {
+       width: 100%;
+       border-collapse: collapse;
+       text-align: left;
+       font-size: 15px;
+   }
+   
+   .data-table th {
+       background-color: #f8fafc;
+       padding: 16px;
+       font-weight: 600;
+       color: var(--text-muted);
+       border-bottom: 2px solid var(--border-color);
+   }
+   
+   .data-table td {
+       padding: 16px;
+       border-bottom: 1px solid var(--border-color);
+       vertical-align: middle;
+   }
+   
+   .vin-code {
+       font-family: monospace; 
+       color: var(--text-muted);
+   }
+   
+   .btn-secondary-action {
+       display: inline-block;
+       background-color: transparent;
+       text-decoration: none;
+       font-weight: 600;
+       padding: 6px 12px; 
+       font-size: 13px; 
+       color: var(--accent); 
+       border: 1px solid rgba(37, 99, 235, 0.3);
+       border-radius: 8px;
+       transition: var(--transition);
+   }
+   
+   .btn-secondary-action:hover {
+       background-color: var(--bg-input);
+   }
+   
+   /* ==========================================================================
+      6. СЕТКА КАРТОЧЕК, ЦВЕТА И ТЕКСТОВЫЕ БЛОКИ
+      ========================================================================== */
+   .grid-2 {
+       display: grid;
+       grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+       gap: 20px;
+       margin-bottom: 30px;
+   }
+   
+   .orange-muted-card {
+       background-color: rgba(249, 115, 22, 0.02) !important; 
+       border: 2px solid #fdba74 !important; 
+       border-radius: var(--radius);
+       padding: 25px;
+       transition: all 0.25s ease-in-out;
+   }
+   
+   .orange-muted-card:hover {
+       border-color: #ea580c !important;
+       background-color: #ffffff !important;
+       box-shadow: 0 6px 20px rgba(234, 88, 12, 0.08) !important;
+   }
+   
+   .card-title {
+       font-size: 18px;
+       margin-bottom: 12px;
+       display: flex;
+       align-items: center;
+       gap: 10px;
+   }
+   
+   .card-icon {
+       font-size: 20px;
+   }
+   
+.loyalty-color, .loyalty-color strong { color: #0c56ea !important; font-weight: 700; }.promo-color, .promo-color strong { color: #ea0c0c !important; font-weight: 700; }.brand-color, .brand-color strong { color: #ea580c !important; font-weight: 700; }.card-text {font-size: 15px;}.card-subtext {color: var(--text-muted);margin-top: 5px;font-size: 14px;}.info-section {margin-bottom: 30px;}.company-text {color: #000000;max-width: 1000px;font-weight: 400;font-size: 15px;}.company-actions {margin-top: 20px;display: flex;gap: 15px;}/* ==========================================================================7. ОФОРМЛЕНИЕ КНОПОК ДЕЙСТВИЯ (С ЗАЛИВКОЙ)========================================================================== */.btn-primary-custom {display: inline-block;padding: 12px 24px;border-radius: 8px;font-size: 15px;font-weight: 600;cursor: pointer;text-decoration: none;transition: var(--transition);background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;color: #ffffff !important;box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;border: 1px solid rgba(29, 78, 216, 0.2) !important;}.btn-primary-custom:hover {background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;transform: translateY(-1px);box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3) !important;}.btn-secondary-custom {display: inline-block;padding: 12px 24px;border-radius: 8px;font-size: 15px;font-weight: 600;cursor: pointer;text-decoration: none;transition: var(--transition);background-color: rgba(249, 115, 22, 0.08) !important;color: #ea580c !important;border: 1.5px solid #fdba74 !important;box-shadow: 0 2px 6px rgba(249, 115, 22, 0.02) !important;}.btn-secondary-custom:hover {background-color: #ea580c !important;color: #ffffff !important;border-color: #ea580c !important;transform: translateY(-1px);box-shadow: 0 4px 12px rgba(234, 88, 12, 0.15) !important;}footer {border-top: 1px solid var(--border-color);padding: 20px 4%;text-align: center;color: var(--text-muted);font-size: 14px;margin-top: 50px;}/* ==========================================================================8. СТИЛИ ДЛЯ СТРАНИЦ АВТОРИЗАЦИИ И РЕГИСТРАЦИИ (ЦЕНТРИРОВАНИЕ И ПОДСВЕТКА)========================================================================== */.login-wrapper {display: flex;justify-content: center;align-items: center;min-height: calc(100vh - 260px);padding: 20px;}.login-card {background-color: rgba(249, 115, 22, 0.02) !important;border: 2px solid #fdba74 !important;border-radius: var(--radius);padding: 40px;width: 100%;box-shadow: 0 4px 15px rgba(234, 88, 12, 0.02);transition: all 0.25s ease-in-out;}.login-card:hover {border-color: #ea580c !important;background-color: #ffffff !important;box-shadow: 0 8px 25px rgba(234, 88, 12, 0.08) !important;}.login-card h2 {font-size: 24px;font-weight: 700;color: #000000;margin-bottom: 25px;text-align: center;}.form-group-login {margin-bottom: 20px;}.form-group-login label {display: block;margin-bottom: 8px;font-size: 14px;font-weight: 600;color: #000000;}.login-control {width: 100%;background-color: #ffffff;border: 2px solid #fdba74 !important;padding: 12px 16px;border-radius: 8px;color: #000000;font-size: 15px;transition: all 0.25s ease-in-out;}.login-control:hover,.login-control:focus {outline: none;border-color: #ea580c !important;box-shadow: 0 0 10px rgba(234, 88, 12, 0.2) !important;}.login-footer {margin-top: 20px;text-align: center;font-size: 14px;color: var(--text-muted);}.login-footer a {color: var(--accent);font-weight: 600;text-decoration: none;transition: var(--transition);}.login-footer a:hover {color: var(--accent-hover);text-decoration: underline;}/* Адаптивные медиа-запросы */@media (max-width: 992px) {.main-header .header-top {flex-direction: column;border-radius: 20px !important;gap: 15px;align-items: flex-start;}.main-nav { flex-wrap: wrap; }.user-menu { margin-left: 0; }}@media (max-width: 600px) {.grid-2 { grid-template-columns: 1fr; }.search-container { flex-direction: column; }.search-btn { padding: 12px; }} 
+/* ==========================================================================
+   7. ОФОРМЛЕНИЕ КНОПОК ДЕЙСТВИЯ (С СВЕЖЕЙ ЗАЛИВКОЙ)
+   ========================================================================== */
+   .btn-primary-custom {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+    border: 1px solid rgba(29, 78, 216, 0.2) !important;
+}
+
+.btn-primary-custom:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3) !important;
+}
+
+.btn-secondary-custom {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition);
+    background-color: rgba(249, 115, 22, 0.08) !important;
+    color: #ea580c !important;
+    border: 1.5px solid #fdba74 !important;
+    box-shadow: 0 2px 6px rgba(249, 115, 22, 0.02) !important;
+}
+
+.btn-secondary-custom:hover {
+    background-color: #ea580c !important;
+    color: #ffffff !important;
+    border-color: #ea580c !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.15) !important;
+}
+
+/* ==========================================================================
+   8. СТИЛИ ДЛЯ СТРАНИЦ АВТОРИЗАЦИИ И РЕГИСТРАЦИИ (ЦЕНТРИРОВАНИЕ И ПОДСВЕТКА)
+   ========================================================================== */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 260px); 
+    padding: 20px;
+}
+
+.login-card {
+    background-color: rgba(249, 115, 22, 0.02) !important; 
+    border: 2px solid #fdba74 !important; 
+    border-radius: var(--radius);
+    padding: 40px;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(234, 88, 12, 0.02);
+    transition: all 0.25s ease-in-out;
+}
+
+.login-card:hover {
+    border-color: #ea580c !important; 
+    background-color: #ffffff !important;
+    box-shadow: 0 8px 25px rgba(234, 88, 12, 0.08) !important;
+}
+
+.login-card h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.form-group-login {
+    margin-bottom: 20px;
+}
+
+.form-group-login label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #000000;
+}
+
+.login-control {
+    width: 100%;
+    background-color: #ffffff;
+    border: 2px solid #fdba74 !important; 
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: #000000;
+    font-size: 15px;
+    transition: all 0.25s ease-in-out;
+}
+
+.login-control:hover,
+.login-control:focus {
+    outline: none;
+    border-color: #ea580c !important; 
+    box-shadow: 0 0 10px rgba(234, 88, 12, 0.2) !important;
+}
+
+.login-footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.login-footer a {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.login-footer a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   9. АДАПТИВНОСТЬ (МЕДИА-ЗАПРОСЫ)
+   ========================================================================== */
+@media (max-width: 992px) {
+    .main-header .header-top {
+        flex-direction: column;
+        border-radius: 20px !important;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    .main-nav { flex-wrap: wrap; }
+    .user-menu { margin-left: 0; }
+}
+
+@media (max-width: 600px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .search-container { flex-direction: column; }
+    .search-btn { padding: 12px; }
+}
+/* ==========================================================================
+   10. СТИЛИ ДЛЯ СТРАНИЦЫ ОРИГИНАЛЬНЫХ КАТАЛОГОВ (БРЕНДЫ И СЕТКИ)
+   ========================================================================== */
+   .catalog-section-title {
+    margin-bottom: 25px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Сетка для выбора автомобильных брендов */
+.brands-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+/* Карточка марки автомобиля */
+.brand-item {
+    background-color: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+/* Состояние при наведении мыши */
+.brand-item:hover {
+    border-color: #fdba74 !important; /* Наш тускло-оранжевый бордер */
+    background-color: rgba(249, 115, 22, 0.02);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(234, 88, 12, 0.05);
+}
+
+/* Состояние, когда марка автомобиля выбрана */
+.brand-item.selected {
+    border-color: #ea580c !important; /* Фирменный ярко-оранжевый бордер */
+    background-color: rgba(249, 115, 22, 0.05);
+    box-shadow: 0 0 12px rgba(234, 88, 12, 0.15);
+}
+
+/* Заглушка под круглый логотип */
+.brand-logo-placeholder {
+    width: 50px;
+    height: 50px;
+    background-color: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #475569;
+    transition: all 0.2s ease-in-out;
+}
+
+.brand-item:hover .brand-logo-placeholder,
+.brand-item.selected .brand-logo-placeholder {
+    background-color: #ea580c;
+    color: #ffffff;
+}
+
+.brand-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* Панель дальнейших действий (появляется снизу плавно) */
+.selection-panel {
+    display: none; 
+    margin-top: 30px;
+    animation: fadeInCatalogPanel 0.3s ease-in-out;
+}
+
+@keyframes fadeInCatalogPanel {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* ==========================================================================
+   11. ДОПОЛНИТЕЛЬНЫЕ ЭФФЕКТЫ ДЛЯ КИТАЙСКИХ КАТАЛОГОВ
+   ========================================================================== */
+   .brand-item.china-brand:hover {
+    border-color: rgba(234, 12, 12, 0.4) !important; /* Легкая темно-красная рамка при наведении */
+    background-color: rgba(234, 12, 12, 0.01);
+    box-shadow: 0 6px 15px rgba(234, 12, 12, 0.03);
+}
+
+.brand-item.china-brand.selected {
+    border-color: #ea0c0c !important; /* Яркая красная рамка при фиксации выбора */
+    background-color: rgba(234, 12, 12, 0.03);
+    box-shadow: 0 0 12px rgba(234, 12, 12, 0.1);
+}
+
+.brand-item.china-brand:hover .brand-logo-placeholder,
+.brand-item.china-brand.selected .brand-logo-placeholder {
+    background-color: #ea0c0c; /* Заливка кружка логотипа красным цветом */
+    color: #ffffff;
+}
+/* ==========================================================================
+   12. СТИЛИ ДЛЯ КАТАЛОГА ЗАМЕНИТЕЛЕЙ И АНАЛОГОВ
+   ========================================================================== */
+   .brand-item.replacement-brand:hover {
+    border-color: rgba(37, 99, 235, 0.4) !important; /* Легкая синяя рамка при наведении */
+    background-color: rgba(37, 99, 235, 0.01);
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.03);
+}
+
+.brand-item.replacement-brand.selected {
+    border-color: #2563eb !important; /* Яркий синий бордер при выборе */
+    background-color: rgba(37, 99, 235, 0.03);
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.1);
+}
+
+.brand-item.replacement-brand:hover .brand-logo-placeholder,
+.brand-item.replacement-brand.selected .brand-logo-placeholder {
+    background-color: #2563eb; /* Заливка кружка логотипа синим цветом */
+    color: #ffffff;
+}
+/* ==========================================================================
+   13. СТИЛИ ДЛЯ КАТАЛОГА ШИН И ДИСКОВ (КОМПАКТНЫЕ И СУЖЕННЫЕ)
+   ========================================================================== */
+.brand-item.tyre-brand:hover {
+    border-color: rgba(71, 85, 105, 0.4) !important; /* Угольно-серая рамка при наведении */
+    background-color: rgba(71, 85, 105, 0.01) !important;
+    box-shadow: 0 6px 15px rgba(71, 85, 105, 0.03) !important;
+}
+
+.brand-item.tyre-brand.selected {
+    border-color: #475569 !important; /* Графитовый бордер при выборе */
+    background-color: rgba(71, 85, 105, 0.03) !important;
+    box-shadow: 0 0 12px rgba(71, 85, 105, 0.1) !important;
+}
+
+.brand-item.tyre-brand:hover .brand-logo-placeholder,
+.brand-item.tyre-brand.selected .brand-logo-placeholder {
+    background-color: #475569 !important; /* Заливка кружка логотипа темным цветом */
+    color: #ffffff !important;
+}
+/* ==========================================================================
+   14. СТИЛИ ДЛЯ КАТАЛОГА АВТОЛАМП (ЯНТАРНО-ЖЕЛТАЯ ПОДСВЕТКА)
+   ========================================================================== */
+   .brand-item.lamp-brand:hover {
+    border-color: rgba(234, 179, 8, 0.4) !important; /* Теплая желтая рамка при наведении */
+    background-color: rgba(234, 179, 8, 0.01) !important;
+    box-shadow: 0 6px 15px rgba(234, 179, 8, 0.03) !important;
+}
+
+.brand-item.lamp-brand.selected {
+    border-color: #eab308 !important; /* Янтарный бордер при выборе */
+    background-color: rgba(234, 179, 8, 0.03) !important;
+    box-shadow: 0 0 12px rgba(234, 179, 8, 0.1) !important;
+}
+
+.brand-item.lamp-brand:hover .brand-logo-placeholder,
+.brand-item.lamp-brand.selected .brand-logo-placeholder {
+    background-color: #eab308 !important; /* Заливка кружка логотипа желтым цветом */
+    color: #ffffff !important;
+}
+/* ==========================================================================
+15. ДОПОЛНИТЕЛЬНЫЕ НАСТРОЙКИ СТРАНИЦЫ ГАРАЖА
+========================================================================== */
+#active-car-select {
+ font-weight: 600;
+ color: var(--text-main);
+ border-color: #fdba74 !important;
+}
+
+#active-car-select:focus {
+ border-color: #ea580c !important;
+ box-shadow: 0 0 10px rgba(234, 88, 12, 0.2) !important;
+}
+
+/* ==========================================================================
+16. ДОПОЛНИТЕЛЬНЫЕ НАСТРОЙКИ СТРАНИЦЫ ГАРАЖА
+========================================================================== */
+/* --- СТИЛИ ДЛЯ СТРАНИЦЫ ЗАКАЗОВ (ORDERS) --- */
+
+/* Зеленая плашка успешного заказа */
+.alert-success {
+    background-color: #dcfce7;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Карточка и шапка заказа */
+.order-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+.order-title { margin: 0; font-size: 20px; }
+.order-date { color: #64748b; font-size: 14px; }
+
+/* Статус-баджик */
+.badge {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+}
+.badge-processing { background: #ffedd5; color: #c2410c; }
+
+/* Таймлайн статуса заказа */
+.status-timeline {
+    display: flex;
+    justify-content: space-between;
+    margin: 30px 0;
+    position: relative;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.status-timeline::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 5px;
+    right: 5px;
+    height: 3px;
+    background: #e2e8f0;
+    z-index: 1;
+}
+.timeline-step {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    flex: 1;
+    min-width: 100px;
+}
+.step-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #64748b;
+}
+.timeline-step.active .step-icon {
+    border-color: #ea580c;
+    background: #ea580c;
+    color: #ffffff;
+}
+.timeline-step.completed .step-icon {
+    border-color: #16a34a;
+    background: #16a34a;
+    color: #ffffff;
+}
+.step-label { font-size: 13px; font-weight: 500; }
+.step-date { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+/* Таблица товаров */
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.order-table th, .order-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+.order-table th { background: #f8fafc; color: #64748b; font-size: 14px; }
+.parts-subtext { font-size: 13px; color: #64748b; }
+
+/* Блок итоговой стоимости */
+.order-summary {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+.summary-box { text-align: right; line-height: 1.6; }
+.discount-text { color: #ea580c; font-weight: 600; }
+.total-price { font-size: 20px; margin-top: 10px; font-weight: bold; }
+.total-price span { color: #ea580c; }
+
+/* Кнопки действий */
+.actions-bar { display: flex; gap: 10px; margin-top: 25px; }
+.btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-block;
+}
+.btn-primary { background: #ea580c; color: #ffffff; }
+.btn-secondary { background: #f1f5f9; color: #0f172a; border: 1px solid #e2e8f0; }
+.btn-secondary:hover { background: #e2e8f0; }
+
+/* ==========================================================================
+17.
+========================================================================== */
+/* --- СТИЛИ ДЛЯ ИНТЕРАКТИВНОЙ ТАБЛИЦЫ СПИСКА ЗАКАЗОВ --- */
+
+/* Кликабельная строка списка заказов */
+.clickable-order-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.clickable-order-row:hover {
+    background-color: #f1f5f9; /* Подсветка строки при наведении мыши */
+}
+
+/* Зеленый статус для выданных заказов в списке */
+.badge-success-status {
+    background: #dcfce7;
+    color: #16a34a;
+}
+/* --- СТИЛИ ДЛЯ СТРАНИЦЫ ОПЛАТЫ ПО QR --- */
+
+.qr-payment-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.qr-subtitle {
+    color: #64748b;
+    margin-top: -10px;
+    margin-bottom: 30px;
+    font-size: 15px;
+}
+
+.qr-content-layout {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    flex-wrap: wrap; /* Чтобы на мобильных устройствах блоки вставали друг под друга */
+}
+
+/* ==========================================================================
+18. 
+========================================================================== */
+/* --- СТИЛИ ДЛЯ ИНТЕРАКТИВНОЙ СТРАНИЦЫ ОПЛАТЫ ПО QR --- */
+
+.qr-payment-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.qr-subtitle {
+    color: #64748b;
+    margin-top: -10px;
+    margin-bottom: 30px;
+    font-size: 15px;
+    text-align: center;
+}
+
+.custom-qr-input {
+    width: 100%;
+    max-width: 280px;
+    padding: 12px;
+    border: 2px solid #ea580c !important;
+    border-radius: 6px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #ea580c;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.custom-qr-input:focus {
+    background-color: #fff7ed !important;
+    box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.15);
+}
+
+/* Центральный контейнер с QR-кодом (появляется по кнопке) */
+.centered-qr-container {
+    display: none; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #e2e8f0;
+    animation: qrFadeIn 0.4s ease forwards;
+}
+
+@keyframes qrFadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.qr-code-wrapper {
+    border: 2px solid #e2e8f0;
+    padding: 15px;
+    border-radius: 12px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.sbp-logo-badge {
+    margin-top: 10px;
+    background: #1e3a8a;
+    color: #ffffff;
+    font-weight: 800;
+    padding: 4px 14px;
+    border-radius: 4px;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+.steps-list {
+    padding-left: 20px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.steps-list li {
+    margin-bottom: 8px;
+    color: #334155;
+}
+
+.qr-alert-info {
+    background-color: #f0f9ff;
+    border: 1px solid #bae6fd;
+    color: #0369a1;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* ==========================================================================
+19. 
+========================================================================== */
+/* --- СТИЛИ ДЛЯ СТРАНИЦЫ КОРЗИНЫ (CART) --- */
+#cart-card {
+    min-height: 250px;
+}
+
+.order-table td button:hover {
+    text-decoration: underline;
+}
+
+/* ИСПРАВЛЕНО: Строка заголовков таблицы становится оранжевой вместо серой */
+.order-table th {
+    background: #f88040 !important; /* Фирменный оранжевый фон */
+    color: #0b0b0b !important;      /* Белый цвет текста для читаемости */
+    font-weight: 600;
+}
+
+/* 20.--- ГАРАНТИРОВАННАЯ ГРАФИЧЕСКАЯ ГАЛОЧКА ДЛЯ ТАБЛИЦЫ ВОЗВРАТОВ --- */
+
+/* Контейнер для кастомного чекбокса */
+.custom-checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    position: relative;
+    transition: all 0.2s ease;
+}
+/* Стартовое состояние: аккуратная оранжевая рамка */
+.custom-reason-select {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    border: 2px solid #ea580c !important; /* Тонкая фирменная оранжевая рамка */
+    border-radius: 6px;
+    font-size: 15px;
+    background-color: #ffffff;
+    cursor: pointer;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+/* Состояние при выборе (клик/фокус): фон становится светло-оранжевым */
+.custom-reason-select:focus {
+    background-color: #fff7ed !important; /* Мягкий светло-оранжевый оттенок */
+    box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.15); /* Деликатное внешнее свечение */
+}
+
+/* Эффект при наведении на строку */
+.returns-row:hover .custom-checkbox-wrapper {
+    border-color: #94a3b8;
+}
+
+/* Стили, когда строка ЗАКАЗА ВЫБРАНА */
+.returns-row.selected .custom-checkbox-wrapper {
+    border-color: #ea580c;
+    background: #ea580c;
+}
+
+/* Сама галочка (рисуем внутренний индикатор галочки) */
+.returns-row.selected .custom-checkbox-wrapper::after {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 11px;
+    border: solid #ffffff;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+/* Чекбоксы для самих запчастей внутри заказа */
+.part-checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #cbd5e1;
+    border-radius: 4px;
+    background: #ffffff;
+    position: relative;
+    cursor: pointer;
+}
+
+.return-item-row.selected-part .part-checkbox-wrapper {
+    border-color: #ea580c;
+    background: #ea580c;
+}
+
+.return-item-row.selected-part .part-checkbox-wrapper::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* --- СТИЛИ ДЛЯ ИТОГО В ВОЗВРАТАХ --- */
+.return-summary-box {
+    background: #f8fafc;
+    padding: 15px 20px;
+    border-radius: 6px;
+    border-left: 4px solid #ea580c;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.return-total-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ea580c;
+}
+
+/*21. --- СТИЛИ ДЛЯ СТРАНИЦЫ ОФОРМЛЕНИЯ РЕКЛАМАЦИЙ (CLAIMS) --- */
+
+.claims-card { 
+    background: #ffffff; 
+    border-radius: 8px; 
+    padding: 30px; 
+    margin-bottom: 25px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+}
+
+.claims-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-bottom: 25px; 
+    text-align: left; 
+}
+
+.claims-table th, .claims-table td { 
+    padding: 15px; 
+    border-bottom: 1px solid #e2e8f0; 
+}
+
+.claims-table th { 
+    background: #ea580c; 
+    color: #ffffff; 
+    font-weight: 600; 
+}
+
+.claims-row { 
+    cursor: pointer; 
+    transition: background 0.15s; 
+}
+
+.claims-row:hover { 
+    background: #f8fafc; 
+}
+
+/* Надежная графическая галочка для артикулов внутри заказа */
+.claim-checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #cbd5e1;
+    border-radius: 4px;
+    background: #ffffff;
+    position: relative;
+    cursor: pointer;
+}
+
+.claim-part-row.selected-part .claim-checkbox-wrapper {
+    border-color: #ea580c;
+    background: #ea580c;
+}
+
+.claim-part-row.selected-part .claim-checkbox-wrapper::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.claim-part-row { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 12px 10px; 
+    border-bottom: 1px solid #e2e8f0; 
+    border-radius: 4px; 
+}
+
+.claim-part-row:last-child { 
+    border-bottom: none; 
+}
+
+.form-group { 
+    margin-top: 20px; 
+    margin-bottom: 15px; 
+}
+
+.form-group label { 
+    display: block; 
+    font-weight: 600; 
+    margin-bottom: 8px; 
+    font-size: 15px; 
+}
+
+.form-control { 
+    width: 100%; 
+    padding: 10px; 
+    border: 1px solid #e2e8f0; 
+    border-radius: 6px; 
+    font-size: 14px; 
+    box-sizing: border-box; 
+}
+/* Применяем оранжевую рамку к селекту рекламаций и текстовому полю */
+.custom-claim-select,
+.custom-claim-textarea {
+    width: 100%;
+    max-width: 500px;
+    padding: 10px;
+    border: 2px solid #ea580c !important; /* Тонкая фирменная оранжевая рамка */
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #ffffff;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+/* Состояние при клике (фокусе): фон становится светло-оранжевым */
+.custom-claim-select:focus,
+.custom-claim-textarea:focus {
+    background-color: #fff7ed !important; /* Мягкий светло-оранжевый оттенок */
+    box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.15); /* Внешнее свечение */
+}
+
+/*23. --- СТИЛИ ДЛЯ СТРАНИЦЫ ВЗАИМОРАСЧЕТОВ (FINANCE) --- */
+
+.finance-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Сетка для блоков с балансом и лимитами */
+.finance-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.overview-item {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #cbd5e1;
+}
+
+.overview-item.positive { border-left-color: #16a34a; }
+.overview-item.warning { border-left-color: #ea580c; }
+
+.overview-label {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.overview-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0f172a;
+}
+
+/* Интерактивные вкладки (Табы) */
+.finance-tabs {
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 20px;
+}
+
+.finance-tab-btn {
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    font-size: 15px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.15s ease;
+}
+
+.finance-tab-btn:hover {
+    color: #ea580c;
+}
+
+.finance-tab-btn.active {
+    color: #ea580c;
+    border-bottom-color: #ea580c;
+}
+
+/* Фильтр поиска сумм */
+.finance-filter-bar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+/* Таблицы взаиморасчетов */
+.finance-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.finance-table th, .finance-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 15px;
+}
+
+.finance-table th {
+    background: #ea580c;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.finance-table tr:hover {
+    background: #f8fafc;
+}
+
+/* Цвета для сумм */
+.amount-plus { color: #16a34a; font-weight: 600; }
+.amount-minus { color: #ef4444; font-weight: 600; }
+/*24. --- СТИЛИ ДЛЯ СТРАНИЦЫ ГРАФИКА РАСЧЕТОВ (SCHEDULE) --- */
+
+.schedule-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    margin-top: 15px;
+}
+
+.schedule-table th, .schedule-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 15px;
+}
+
+.schedule-table th {
+    background: #ea580c;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.schedule-row:hover {
+    background: #f8fafc;
+}
+
+/* Статусы задолженности */
+.status-ok {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+/* КРАСНЫЙ ШРИФТ: осталось 7 дней или меньше */
+.debt-urgent {
+    color: #ef4444 !important;
+    font-weight: bold;
+}
+
+/* ЧЕРНЫЙ ШРИФТ: осталось более 7 дней */
+.debt-normal {
+    color: #0f172a !important;
+    font-weight: 600;
+}
+
+.days-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+}
+.badge-urgent { background: #fee2e2; color: #ef4444; }
+.badge-normal { background: #f1f5f9; color: #475569; }
+
+/*25 Стили для выпадающего меню (Dropdown) */
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-label {
+    color: #000000;
+    font-weight: 600;
+    font-size: 14px;
+    user-select: none;
+}
+
+/* Скрываем контент по умолчанию */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 220px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+    z-index: 999;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    padding: 6px 0;
+    margin-top: 2px;
+}
+
+/* Ссылки внутри выпадающего списка */
+.dropdown-content a {
+    color: #334155;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+/* Эффект при наведении на ссылку в меню */
+.dropdown-content a:hover {
+    background-color: #f1f5f9;
+    color: #ea580c;
+}
+
+/* Показываем меню при наведении мыши на родительский блок .dropdown */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Разрешаем клик по кнопке "Программы", даже если на нее наложен dropdown */
+.dropdown > a.nav-label {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 100000 !important;
+}
+/* ==========================================================================
+   26. НАСТРОЙКА СЕЛЕКТОРА ТЕМЫ ОБРАЩЕНИЯ (СТРАНИЦА МЕНЕДЖЕРА)
+   ========================================================================== */
+
+/* Исходное состояние: тускло-оранжевая рамка */
+#request-subject {
+    border: 2px solid #fdba74 !important; /* Светло-оранжевый Orange 300 */
+    background-color: rgba(249, 115, 22, 0.02) !important; /* Едва заметный оранжевый оттенок */
+    transition: all 0.25s ease-in-out !important; /* Плавный переход цвета */
+}
+
+/* Состояние при наведении мыши (Hover) и при выборе поля (Focus) */
+#request-subject:hover,
+#request-subject:focus {
+    outline: none !important;
+    background-color: #ffffff !important; /* Чистый белый фон при активности */
+    border-color: #ea580c !important; /* Яркий фирменный оранжевый */
+    box-shadow: 0 0 12px rgba(234, 88, 12, 0.25) !important; /* Мягкое оранжевое свечение */
+}
+/* ==========================================================================
+   НАСТРОЙКА ПОЛЯ ВВОДА ТЕКСТА ЗАПРОСА (СТРАНИЦА МЕНЕДЖЕРА)
+   ========================================================================== */
+
+/* Исходное состояние textarea: тускло-оранжевая рамка и легкий фон */
+#request-text {
+    border: 2px solid #fdba74 !important; /* Светло-оранжевый Orange 300 */
+    background-color: rgba(249, 115, 22, 0.02) !important; /* Едва заметный оранжевый оттенок */
+    transition: all 0.25s ease-in-out !important; /* Плавный переход цвета */
+}
+
+/* Состояние при наведении мыши (Hover) и при клике/вводе текста (Focus) */
+#request-text:hover,
+#request-text:focus {
+    outline: none !important;
+    background-color: #ffffff !important; /* Чистый белый фон при активности */
+    border-color: #ea580c !important; /* Яркий фирменный оранжевый */
+    box-shadow: 0 0 12px rgba(234, 88, 12, 0.25) !important; /* Мягкое оранжевое свечение */
+}
+
+/* Красивое подчеркивание имени пользователя при наведении */
+#nav-user-greeting:hover {
+    text-decoration: underline !important;
+}
+/* Расширение оранжевого стиля для селекта контрагента на панели менеджера */
+#mgr-client-select {
+    border: 2px solid #fdba74 !important;
+    background-color: rgba(249, 115, 22, 0.02) !important;
+    color: #000000 !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+#mgr-client-select:hover, 
+#mgr-client-select:focus {
+    outline: none !important;
+    background-color: #ffffff !important;
+    border-color: #ea580c !important;
+    box-shadow: 0 0 12px rgba(234, 88, 12, 0.25) !important;
+}
+/* Оранжевые стили для полей ввода и фильтров на странице обращений */
+#request-subject, #filter-subject {
+    border: 2px solid #fdba74 !important;
+    background-color: rgba(249, 115, 22, 0.02) !important;
+    color: #000000 !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+#request-subject:hover, #request-subject:focus,
+#filter-subject:hover, #filter-subject:focus {
+    outline: none !important;
+    background-color: #ffffff !important;
+    border-color: #ea580c !important;
+    box-shadow: 0 0 12px rgba(234, 88, 12, 0.25) !important;
+}
+
+/* Вставьте в самый конец файла styles.css */
+.city-select {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-right: 25px !important;
+    white-space: nowrap !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.city-select select {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #040404 !important;
+    background-color: #ffffff !important;
+    border: 1px solid rgba(234, 88, 12, 0.4) !important;
+    padding: 4px 8px !important;
+    border-radius: 6px !important;
+}
+/* Отмена подчеркивания логотипа платформы */
+.logo, .logo:hover {
+    text-decoration: none !important;
+}
+
+/* Строки деталей с артикулами под таблицей */
+.part-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.part-item-row:hover {
+    background: #f1f5f9;
+}
+
+/* Стили чекбокса для деталей */
+.part-checkbox-indicator {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #cbd5e1;
+    border-radius: 4px;
+    text-align: center;
+    line-height: 16px;
+    font-weight: bold;
+    background: #ffffff;
+    user-select: none;
+}
+
+/* Убираем автоматическое подчеркивание ссылки бренда */
+.logo, .logo:hover {
+    text-decoration: none !important;
+}
+
+/* Стилизация строк таблиц движения капитала */
+.finance-table td {
+    border-bottom: 1px solid #e2e8f0;
+}
+.finance-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* 28 МОДАЛЬНОЕ окно
+Фоновая полупрозрачная подложка, блокирующая экран */
+.modal-overlay {
+    display: none; /* Изначально скрыто */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6); /* Темный стильный фон */
+    backdrop-filter: blur(4px); /* Мягкое размытие заднего плана */
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Карточка самого модального окна */
+.modal-card {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 16px;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid #fee2e2;
+    
+    /* Анимация плавного выезда сверху */
+    animation: slideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Иконка предупреждения */
+.modal-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+    animation: pulse 1.5s infinite;
+}
+
+.modal-card h3 {
+    font-size: 20px;
+    color: #0f172a;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.modal-card p {
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+/* Кнопка "Попробовать еще раз" */
+.modal-btn {
+    background: #ea580c; /* Фирменный оранжевый */
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s ease;
+}
+
+.modal-btn:hover {
+    background: #c2410c;
+}
+
+/* Анимации появления */
+@keyframes slideDown {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* 29 МЕНЮ МЕНЕДЖЕРА
+Фоновая полупрозрачная подложка, блокирующая экран */
+/*  Полный сброс подчеркиваний ссылок шапки */
+.logo, .logo:hover {
+    text-decoration: none !important;
+}
+
+/* Оформление таблицы логистики деталей менеджера */
+.schedule-table td {
+    padding: 14px !important;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 14px;
+}
+
+/* Бейджи логистических этапов отслеживания */
+.badge-status-created {
+    background: #fff7ed;
+    color: #c2410c;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 12px;
+    border: 1px solid #ffedd5;
+}
+
+.badge-status-shipping {
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 12px;
+    border: 1px solid #dbeafe;
+}
+
+.badge-status-ready {
+    background: #f0fdf4;
+    color: #16a34a;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 12px;
+    border: 1px solid #dcfce7;
+}
+
+/* Карточки обращений в ленте */
+.ticket-inline-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid #ea580c;
+}
+
+/* Кнопки перевода шагов снабжения */
+.btn-next-step {
+    background: #ea580c;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 12px;
+    width: 100%;
+    transition: background 0.15s;
+}
+.btn-next-step:hover { background: #c2410c; }
+
+.btn-next-success {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 12px;
+    width: 100%;
+    transition: background 0.15s;
+}
+.btn-next-success:hover { background: #15803d; }
+
+/*29 Общие настройки страницы */
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* Служебная зона менеджера (сверху экрана) */
+.client-selection-zone {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+/* Центрирующий враппер для карточки входа */
+.login-wrapper {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Карточка входа */
+.login-card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+}
+
+.login-card h2 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: #0f172a;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #ffffff;
+}
+
+.form-group input:focus, .form-group select:focus {
+    border-color: #ea580c;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+}
+
+/* Обертка для пароля с глазком */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+/* Интерактивные кнопки */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: #ea580c;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: #c2410c;
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 10px;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+.btn-muted {
+    padding: 10px 20px;
+    background: #64748b;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-muted:hover {
+    background: #475569;
+}
+
+/* Выдвижная или проявляющаяся панель */
+.edit-panel {
+    margin-top: 15px;
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 15px;
+}
+
+.edit-panel h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #ea580c;
+    font-weight: 700;
+}
+
+/* Модальные окна */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    max-width: 350px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    transform: scale(0.9);
+    transition: transform 0.2s ease-out;
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.modal-content h3 {
+    margin: 0 0 10px 0;
+    color: #0f172a;
+    font-size: 18px;
+}
+
+.modal-content p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0 0 20px 0;
+    line-height: 1.4;
+}
+
+/* 30 Базовые настройки макета */
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.login-card, .client-selection-zone {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
+
+.login-wrapper {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+/* 1) ОРАНЖЕВЫЕ ТУСКЛЫЕ ПОЛЯ, ЧЕРНЫЙ ТЕКСТ, ЯРКИЕ ПРИ НАВЕДЕНИИ */
+.orange-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid rgba(234, 88, 12, 0.4) !important; /* Тускло-оранжевая граница */
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #ffffff;
+    color: #000000 !important; /* Строго черный текст */
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+.orange-input:hover {
+    border-color: rgba(234, 88, 12, 0.8) !important; /* Оранжевый при наведении */
+    background-color: #fffaf7;
+}
+
+.orange-input:focus {
+    border-color: #ea580c !important; /* Яркий оранжевый при фокусе */
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+    background-color: #ffffff;
+}
+
+/* Элементы управления и кнопки */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: #ea580c;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: #c2410c;
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 10px;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+.btn-muted {
+    padding: 10px 20px;
+    background: #64748b;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.edit-panel {
+    margin-top: 15px;
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 15px;
+}
+
+.edit-panel h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #ea580c;
+    font-weight: 700;
+}
+
+/* Модальные окна */
+.modal-overlay {
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6); 
+    z-index: 1000; 
+    align-items: center; 
+    justify-content: center;
+}
+
+.modal-content {
+    background: #ffffff; 
+    padding: 25px; 
+    border-radius: var(--radius); 
+    max-width: 350px; 
+    width: 90%;
+    text-align: center; 
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+}

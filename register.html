@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>АвтоМаркет — Регистрация</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ ПО ГОРИЗОНТАЛИ -->
+    <header class="main-header" style="background: none; border: none; box-shadow: none; position: relative; z-index: 100;">
+        <div class="header-top">
+            
+            <!-- ЛОГОТИП АВТОМАРКЕТ В ВЕРХНЕМ ЛЕВЫМ УГЛУ (КЛИКАБЕЛЬНЫЙ) -->
+            <a href="index.html" class="logo" style="font-size: 22px; white-space: nowrap; margin-right: 25px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 2px 4px rgba(234, 88, 12, 0.2));">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span style="font-weight: 800; letter-spacing: -0.5px; color: #000000;">Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+            <!-- ВЫБОР ГОРОДА -->
+            <div class="city-select">
+                <span>Город: </span>
+                <select id="header-city-select">
+                    <option value="Москва" selected>Москва</option>
+                    <option value="Пенза">Пенза</option>
+                    <option value="Санкт-Петербург">Санкт-Петербург</option>
+                </select>
+            </div>
+
+            <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ (УНИВЕРСАЛЬНОЕ СКВОЗНОЕ С ПРОФИЛЕМ) -->
+            <nav class="main-nav" style="margin-right: auto;">
+                <a href="glavnaya.html" class="nav-link">Главная</a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Каталоги ▾</div>
+                    <div class="dropdown-content">
+                        <a href="catalog.html">Оригинальный каталог</a>
+                        <a href="china_catalog.html">Китайский каталог</a>
+                        <a href="replacements_catalog.html">Каталог заменителей</a>
+                        <a href="tyres_catalog.html">Каталог шин и дисков</a>
+                        <a href="lamps_catalog.html">Автолампы</a>
+                        <a href="garage.html">Гараж</a>
+                    </div>
+                </div>
+
+                <!-- КОРЗИНА: Сохранен оранжевый кругляшок-счётчик количества товаров -->
+                <a href="cart.html" class="nav-link" id="nav-cart-link">Корзина <span id="cart-counter" style="background: #ea580c; color: white; padding: 2px 7px; border-radius: 20px; font-size: 12px; margin-left: 3px; display: none;">0</span></a>
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Заказы ▾</div>
+                    <div class="dropdown-content">
+                        <a href="orders.html?action=view">Заказы</a>
+                        <a href="returns.html">Оформление возвратов</a>
+                        <a href="claims.html">Оформление рекламаций</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Взаиморасчеты ▾</div>
+                    <div class="dropdown-content">
+                        <a href="sales.html">Продажи (Архив сделок)</a>
+                        <a href="finance.html">Финансы</a>
+                        <a href="schedule.html">График расчетов</a>
+                    </div>
+                </div>
+
+                <!-- ИСПРАВЛЕНО И ДОБАВЛЕНО: Сквозная ссылка на Личный профиль (Карточку клиента) -->
+                <a href="profile.html" class="nav-link">Личные данные</a>
+
+                <a href="qrcode.html" class="nav-link">Оплата по QR</a>
+            </nav>
+
+            <div class="user-menu">
+                <a href="index.html" class="nav-link" style="padding: 0; font-weight: bold; color: #0c56ea;">Вход</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- БЛОК РЕГИСТРАЦИИ СТРОГО ПО ЦЕНТРУ ЭКРАНА -->
+    <div class="login-wrapper" style="display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 260px); padding: 40px 20px;">
+        <div class="login-card" style="max-width: 440px; width: 100%;">
+            <h2>Регистрация на платформе</h2>
+            <form id="registrationForm" onsubmit="handleRegistration(event)">
+                
+                <!-- Обязательное поле: Фамилия -->
+                <div class="form-group-login">
+                    <label for="reg-surname">Фамилия <span style="color: #ea0c0c;">*</span></label>
+                    <input type="text" id="reg-surname" class="login-control" placeholder="Иванов" required>
+                </div>
+
+                <!-- Обязательное поле: Имя -->
+                <div class="form-group-login" style="margin-top: 15px;">
+                    <label for="reg-name">Имя <span style="color: #ea0c0c;">*</span></label>
+                    <input type="text" id="reg-name" class="login-control" placeholder="Иван" required>
+                </div>
+                <!-- Необязательное поле: Отчество -->
+                <div class="form-group-login" style="margin-top: 15px;">
+                    <label for="reg-patronymic">Отчество</label>
+                    <input type="text" id="reg-patronymic" class="login-control" placeholder="Иванович">
+                </div>
+                
+                <!-- Обязательное поле: Телефон -->
+                <div class="form-group-login" style="margin-top: 15px;">
+                    <label for="reg-phone">Телефон <span style="color: #ea0c0c;">*</span></label>
+                    <input type="tel" id="reg-phone" class="login-control" placeholder="+7 (999) 000-00-00" required>
+                </div>
+
+                <!-- Обязательное поле: E-mail -->
+                <div class="form-group-login" style="margin-top: 15px;">
+                    <label for="reg-email">E-mail <span style="color: #ea0c0c;">*</span></label>
+                    <input type="email" id="reg-email" class="login-control" placeholder="example@mail.ru" required>
+                </div>
+
+                <!-- Выбор города -->
+                <div class="form-group-login" style="margin-top: 15px;">
+                    <label for="reg-city">Выбор города <span style="color: #ea0c0c;">*</span></label>
+                    <select id="reg-city" class="login-control" style="background-color: #ffffff; cursor: pointer;" required>
+                        <option value="" disabled selected>Выберите ваш город</option>
+                        <option value="Москва">Москва</option>
+                        <option value="Пенза">Пенза</option>
+                        <option value="Санкт-Петербург">Санкт-Петербург</option>
+                    </select>
+                </div>
+
+                <!-- Пароль с глазком -->
+                <div class="form-group-login" style="margin-top: 15px;">
+                    <label for="reg-password">Пароль <span style="color: #ea0c0c;">*</span></label>
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <input type="password" id="reg-password" class="login-control" placeholder="••••••••" style="width: 100%; padding-right: 45px;" required>
+                        <span id="toggleRegPassword" style="position: absolute; right: 12px; cursor: pointer; display: flex; align-items: center; color: #94a3b8; user-select: none;">
+                            <svg class="eye-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Повтор пароля с глазком -->
+                <div class="form-group-login" style="margin-top: 15px;">
+                    <label for="reg-password-confirm">Повтор пароля <span style="color: #ea0c0c;">*</span></label>
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <input type="password" id="reg-password-confirm" class="login-control" placeholder="••••••••" style="width: 100%; padding-right: 45px;" required>
+                        <span id="toggleConfirmPassword" style="position: absolute; right: 12px; cursor: pointer; display: flex; align-items: center; color: #94a3b8; user-select: none;">
+                            <svg class="eye-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary-custom" style="width: 100%; border: none; margin-top: 25px; padding: 12px; cursor: pointer;">
+                    Создать личный кабинет
+                </button>
+            </form>
+
+            <div class="login-footer" style="margin-top: 20px; text-align: center; font-size: 14px;">
+                <span>Уже есть аккаунт? </span>
+                <a href="index.html" style="color: #0c56ea; font-weight: 600; text-decoration: none;">Выполнить вход</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 АвтоМаркет. Все права защищены. Платформа автоматизации снабжения B2B и B2C.</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEyeToggle('reg-password', 'toggleRegPassword');
+            setupEyeToggle('reg-password-confirm', 'toggleConfirmPassword');
+
+            const citySelect = document.getElementById('header-city-select');
+            if (citySelect) {
+                const savedCity = localStorage.getItem('am_selected_city');
+                if (savedCity) citySelect.value = savedCity;
+                citySelect.addEventListener('change', function() {
+                    localStorage.setItem('am_selected_city', this.value);
+                });
+            }
+        });
+
+        function setupEyeToggle(inputId, buttonId) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(buttonId);
+            if (!input || !btn) return;
+
+            btn.addEventListener('click', function() {
+                const svg = btn.querySelector('.eye-svg');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.style.color = '#ea580c';
+                    svg.innerHTML = `
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    `;
+                } else {
+                    input.type = 'password';
+                    btn.style.color = '#94a3b8';
+                    svg.innerHTML = `
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    `;
+                }
+            });
+        }
+
+        // ИСПРАВЛЕНО: Мгновенное перенаправление на index.html без алертов
+        function handleRegistration(event) {
+            event.preventDefault();
+
+            const surname = document.getElementById('reg-surname').value.trim();
+            const name = document.getElementById('reg-name').value.trim();
+            const patronymic = document.getElementById('reg-patronymic').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const city = document.getElementById('reg-city').value;
+            const password = document.getElementById('reg-password').value;
+            const passwordConfirm = document.getElementById('reg-password-confirm').value;
+
+            if (password !== passwordConfirm) {
+                alert('⚠️ Ошибка: Введенные пароли не совпадают!');
+                return;
+            }
+
+            const fullName = `${name} ${patronymic}`.trim();
+
+            localStorage.setItem('am_user_name', fullName || 'Иван Иванович');
+            localStorage.setItem('am_user_phone', phone);
+            localStorage.setItem('am_user_login', email);
+            localStorage.setItem('am_user_balance', '50000'); 
+            localStorage.setItem('am_selected_city', city);
+            localStorage.setItem('am_user_registered_pass', password);
+
+            // Мгновенный переход без ожидания клика по окну уведомления
+            window.location.href = 'index.html';
+        }
+    </script>

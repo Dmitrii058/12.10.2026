@@ -1,0 +1,248 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>АвтоМаркет — Вход в систему</title>
+    
+    <!-- Подключение единого моста данных (должен быть строго первым) -->
+    <script src="database.js"></script>
+    
+    <!-- ПОДКЛЮЧЕНИЕ ВНЕШНЕГО ФАЙЛА СТИЛЕЙ СИСТЕМЫ -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ ПО ГОРИЗОНТАЛИ (ПОЛНОСТЬЮ СИНХРОННАЯ С CSS) -->
+    <header class="main-header">
+        <div class="header-top">
+            
+            <!-- ЛОГОТИП АВТОМАРКЕТ -->
+            <a href="index.html" class="logo" style="text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span>Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+            <!-- ВЫБОР ГОРОДА -->
+            <div class="city-select">
+                <span>Город: </span>
+                <select id="header-city-select">
+                    <option value="Москва" selected>Москва</option>
+                    <option value="Пенза">Пенза</option>
+                    <option value="Санкт-Петербург">Санкт-Петербург</option>
+                </select>
+            </div>
+
+            <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ -->
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link active">Главная</a>
+                <a href="#" class="nav-link" onclick="alert('Для просмотра каталогов необходимо авторизоваться!')">Каталоги ▾</a>
+                <a href="#" class="nav-link" onclick="alert('Корзина доступна только авторизованным пользователям!')">Корзина</a>
+            </nav>
+
+            <!-- ПРОФИЛЬ ПЛАТФОРМЫ -->
+            <div class="user-menu">
+                <div style="text-align: right; line-height: 1.3;">
+                    <div style="font-weight: 700; color: #ea580c;">Добрый день!</div>
+                    <div style="font-size: 12px; color: #64748b; font-weight: 600;">Роль: Гость</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- БЛОК ФОРМЫ АВТОРИЗАЦИИ (ИСПОЛЬЗУЕТ КЛАССЫ ИЗ CSS СТРАНИЦЫ) -->
+    <div class="login-wrapper" style="display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 200px); padding: 20px; box-sizing: border-box;">
+        <div class="search-section" style="max-width: 400px; width: 100%; padding: 30px; background: #ffffff; text-align: left; border-radius: var(--radius); box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+            <h3 style="margin-bottom: 20px; font-size: 20px; text-align: center; font-weight: 800;">Вход в АвтоМаркет</h3>
+            
+            <form id="loginForm">
+                <div style="margin-bottom: 15px;">
+                    <label for="username" style="display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Логин (E-mail или телефон)</label>
+                    <input type="email" id="username" class="custom-search-input" placeholder="example@mail.ru" style="width: 100%;" required>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="password" style="display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;">Пароль</label>
+                    <div style="position: relative; display: flex; align-items: center; width: 100%;">
+                        <input type="password" id="password" class="custom-search-input" placeholder="••••••••" style="width: 100%; padding-right: 45px;" required>
+                        
+                        <!-- Переключатель видимости (SVG-глазок) -->
+                        <span id="togglePassword" style="position: absolute; right: 15px; cursor: pointer; display: flex; align-items: center; color: var(--text-muted); user-select: none; width: 24px; height: 24px;">
+                            <svg id="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                
+                <button type="submit" style="width: 100%; border: none; margin-top: 15px; padding: 14px; cursor: pointer; background: var(--brand-orange); color: white; font-weight: bold; border-radius: var(--radius); font-size: 15px; transition: var(--transition);">
+                    Войти в личный кабинет
+                </button>
+            </form>
+            
+            <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px; text-align: center;">
+                <p style="font-size: 14px; margin-bottom: 10px; color: var(--text-main); font-weight: 500;">Впервые на платформе?</p>
+                <a href="register.html" style="display: block; text-align: center; font-size: 14px; padding: 10px; text-decoration: none; background: var(--bg-input); color: var(--text-main); border-radius: var(--radius); font-weight: 600; transition: var(--transition);">
+                    Зарегистрироваться
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ОШИБКИ АВТОРИЗАЦИИ -->
+    <div id="errorModal" class="modal-overlay">
+        <div class="modal-content">
+            <div style="font-size: 40px; margin-bottom: 10px;">❌</div>
+            <h3 style="margin: 0 0 10px 0; color: var(--text-main); font-size: 18px;">Ошибка авторизации</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin: 0 0 20px 0; line-height: 1.4;">Неверно указан логин или пароль. Пожалуйста, проверьте данные.</p>
+            <button onclick="closeErrorModal()" style="padding: 10px 20px; background: var(--text-muted); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Попробовать снова</button>
+        </div>
+    </div>
+
+    <!-- ФУТЕР -->
+    <footer style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
+        <p>&copy; 2026 АвтоМаркет. Все права защищены. Платформа автоматизации снабжения B2B и B2C.</p>
+    </footer>
+    <script>
+        // ЧАСТЬ А: КОРРЕКТНАЯ ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ В LOCALSTORAGE
+        function getGlobalDatabase() {
+            const defaultDatabase = {
+                "123456@mail.ru": {
+                    name: "Иван Иванович",
+                    phone: "+7 (999) 111-22-33",
+                    balance: 45200,
+                    password: "123456",
+                    city: "Москва",
+                    tickets: [
+                        { id: 101, text: "Срочно нужны передние тормозные колодки Brembo на Фокус 3. Есть на складе?", city: "Москва" },
+                        { id: 102, text: "Оформил возврат по браку свечей, когда будет подтверждение?", city: "Москва" }
+                    ],
+                    orders: [
+                        { id: "AM-785112", title: "Фильтр масляный MANN-FILTER", article: "W 610/3", price: 850, status: "Создан" },
+                        { id: "AM-785113", title: "Колодки передние Brembo", article: "P 85 020", price: 2000, status: "К отгрузке" }
+                    ]
+                },
+                "777888@mail.ru": {
+                    name: "Петр Петрович",
+                    phone: "+7 (910) 777-88-99",
+                    balance: 14000,
+                    password: "123456",
+                    city: "Санкт-Петербург",
+                    tickets: [
+                        { id: 103, text: "Заказ со склада Санкт-Петербурга задерживается на два дня, уточните статус.", city: "Санкт-Петербург" }
+                    ],
+                    orders: [
+                        { id: "AM-764301", title: "Амортизатор передний KYB Excel-G", article: "334812", price: 5800, status: "Создан" }
+                    ]
+                }
+            };
+
+            if (!localStorage.getItem('am_global_contractors_db')) {
+                localStorage.setItem('am_global_contractors_db', JSON.stringify(defaultDatabase));
+            }
+            return JSON.parse(localStorage.getItem('am_global_contractors_db'));
+        }
+
+        // ЧАСТЬ Б: ОБРАБОТЧИКИ СОБЫТИЙ И ПРЯМАЯ АВТОРИЗАЦИЯ ФОРМЫ БЕЗ СБРОСОВ
+        document.addEventListener('DOMContentLoaded', function() {
+            localStorage.setItem('am_user_role', 'guest');
+            
+            // Инициализируем базу данных в памяти при первом открытии
+            getGlobalDatabase();
+
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+
+            // 1. ПЕРЕКЛЮЧЕНИЕ ИНТЕРАКТИВНОГО ГЛАЗКА ПАРОЛЯ
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const eyeIcon = document.getElementById('eye-icon');
+
+            if (togglePasswordBtn && passwordInput) {
+                togglePasswordBtn.addEventListener('click', function() {
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        if (eyeIcon) eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.45 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+                    } else {
+                        passwordInput.type = 'password';
+                        if (eyeIcon) eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+                    }
+                });
+            }
+
+            // 2. ОТПРАВКА ФОРМЫ АВТОРИЗАЦИИ (ПРЯМОЙ СКВОЗНОЙ ВХОД)
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(event) {
+                    event.preventDefault(); // Полностью блокируем перезагрузку страницы
+                    
+                    if (!usernameInput || !passwordInput) return;
+
+                    const loginValue = usernameInput.value.trim();
+                    const passwordValue = passwordInput.value.trim();
+                    const db = getGlobalDatabase();
+
+                    // Сценарий 1: Проверка клиента по динамической базе из localStorage (123456@mail.ru / 123456)
+                    if (db[loginValue] && db[loginValue].password === passwordValue) {
+                        const user = db[loginValue];
+                        localStorage.setItem('am_user_role', 'client');
+                        localStorage.setItem('am_user_name', user.name);
+                        localStorage.setItem('am_user_balance', user.balance);
+                        localStorage.setItem('am_user_phone', user.phone);
+                        localStorage.setItem('am_user_email', loginValue);
+                        
+                        window.location.href = 'glavnaya.html';
+                        
+                    // Сценарий 2: Проверка фиксированной роли Менеджера (manager@mail.ru / admin)
+                    } else if (loginValue === 'manager@mail.ru' && passwordValue === 'admin') {
+                        localStorage.setItem('am_user_role', 'manager');
+                        localStorage.setItem('am_user_name', 'Менеджер платформы');
+                        
+                        window.location.href = 'manager_panel.html';
+                    } else {
+                        showErrorModal();
+                    }
+                });
+            }
+        });
+
+        // ЧАСТЬ В: УПРАВЛЕНИЕ МОДАЛЬНЫМ ОКНОМ ОШИБОК
+        function showErrorModal() {
+            const modal = document.getElementById('errorModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.setAttribute('data-open', 'true');
+            }
+        }
+
+        function closeErrorModal() {
+            const modal = document.getElementById('errorModal');
+            const targetPasswordInput = document.getElementById('password');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.removeAttribute('data-open');
+                if (targetPasswordInput) {
+                    targetPasswordInput.value = '';
+                    targetPasswordInput.focus();
+                }
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('errorModal');
+            if (modal && modal.hasAttribute('data-open') && (e.key === 'Escape' || e.key === 'Enter')) {
+                e.preventDefault();
+                closeErrorModal();
+            }
+        });
+
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('errorModal');
+            if (e.target === modal) closeErrorModal();
+        });
+    </script>
+</body>
+</html>

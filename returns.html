@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>АвтоМаркет — Оформление возвратов</title>
+    <script>
+        (function() {
+            let currentRole = localStorage.getItem('am_user_role');
+            let currentUser = localStorage.getItem('am_user_name');
+
+            // Страховка сессии: если вход выполнен под Иваном, принудительно восстанавливаем ключи
+            if (localStorage.getItem('am_user_email') === '123456@mail.ru') {
+                if (!currentRole || currentRole === 'guest') {
+                    localStorage.setItem('am_user_role', 'client');
+                    currentRole = 'client';
+                }
+                if (!currentUser) {
+                    localStorage.setItem('am_user_name', 'Иван Иванович');
+                    localStorage.setItem('am_user_balance', '45200');
+                }
+            }
+
+            // Блокировка: если это обычный гость без логина — отправляем на index.html
+            if (!currentRole || currentRole === 'guest') {
+                alert("Доступ заблокирован! Пожалуйста, сначала войдите в систему.");
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- НАВИГАЦИОННАЯ ПАНЕЛЬ СВЕРХУ -->
+    <header class="main-header" style="background: none; border: none; box-shadow: none;">
+        <div class="header-top">
+            
+            <!-- ЛОГОТИП АВТОМАРКЕТ В ВЕРХНЕМ ЛЕВЫМ УГЛУ (КЛИКАБЕЛЬНЫЙ) -->
+            <a href="glavnaya.html" class="logo" style="font-size: 22px; white-space: nowrap; margin-right: 25px; display: flex; align-items: center; gap: 8px; text-decoration: none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 6v6l4 2"/>
+                    <circle cx="12" cy="12" r="1" fill="#ea580c"/>
+                </svg>
+                <span style="font-weight: 800; letter-spacing: -0.5px; color: #000000; text-decoration: none !important;">Авто<span style="color: #ea580c;">Маркет</span></span>
+            </a>
+
+            <!-- ВЫБОР ГОРОДА -->
+            <div class="city-select">
+                <span>Город: </span>
+                <select id="city-selector">
+                    <option value="Москва">Москва</option>
+                    <option value="Пенза">Пенза</option>
+                    <option value="Санкт-Петербург">Санкт-Петербург</option>
+                </select>
+            </div>
+
+            <!-- ГЛАВНОЕ МЕНЮ НАВИГАЦИИ -->
+            <nav class="main-nav">
+                <a href="glavnaya.html" class="nav-link">Главная</a>
+                
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Каталоги ▾</div>
+                    <div class="dropdown-content">
+                        <a href="catalog.html">Оригинальный каталог</a>
+                        <a href="china_catalog.html">Китайский каталог</a>
+                        <a href="replacements_catalog.html">Каталог заменителей</a>
+                        <a href="tyres_catalog.html">Каталог шин и дисков</a>
+                        <a href="lamps_catalog.html">Автолампы</a>
+                        <a href="garage.html">Garage</a>
+                    </div>
+                </div>
+
+                <a href="cart.html" class="nav-link" id="nav-cart-link">Корзина <span id="cart-counter" style="background: #ea580c; color: white; padding: 2px 7px; border-radius: 20px; font-size: 12px; margin-left: 3px; display: none;">0</span></a>
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Заказы ▾</div>
+                    <div class="dropdown-content">
+                        <a href="orders.html?action=view">Заказы</a>
+                        <a href="returns.html">Оформление возвратов</a>
+                        <a href="claims.html">Оформление рекламаций</a>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <div class="nav-label" style="cursor: pointer; padding: 10px 15px;">Взаиморасчеты ▾</div>
+                    <div class="dropdown-content">
+                        <a href="sales.html">Продажи (Архив сделок)</a>
+                        <a href="finance.html">Финансы</a>
+                        <a href="schedule.html">График расчетов</a>
+                    </div>
+                </div>
+
+                <a href="profile.html" class="nav-link">Личные данные</a>
+                <a href="qrcode.html" class="nav-link">Оплата по QR</a>
+            </nav>
+
+            <!-- ДИНАМИЧЕСКИЙ БЛОК ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ -->
+            <div class="user-menu" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; line-height: 1.3; padding: 4px 0; font-size: 14px; white-space: nowrap;">
+                <!-- ИСПРАВЛЕНО: Теперь это ссылка на профиль во всех файлах -->
+                <a href="profile.html" id="nav-user-greeting" style="font-weight: 600; color: #0c56ea; text-decoration: none; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='#ea580c'" onmouseout="this.style.color='#0c56ea'">Загрузка...</a>
+                <div style="font-weight: 600; color: #000000;">
+                    Баланс: <span style="color: #16a34a;" id="nav-user-balance">0 ₽</span>
+                </div>
+                <a href="#" onclick="handleLogout(event)" style="color: #ef4444; text-decoration: none; font-size: 13px; font-weight: bold; margin-top: 2px;">Выход</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- УВЕДОМЛЕНИЕ ОБ УСПЕШНОЙ ОТПРАВКЕ -->
+        <div class="alert-success" id="return-alert" style="display: none; background-color: #dcfce7; border: 1px solid #bbf7d0; color: #15803d; padding: 16px; border-radius: 8px; margin-bottom: 25px; justify-content: space-between; align-items: center;">
+            <span>🎉 <strong id="alert-text">Заявка на возврат создана!</strong> Менеджер свяжется с вами после проверки на складе.</span>
+            <span style="cursor:pointer; font-weight: bold;" onclick="this.parentElement.style.display='none'">✕</span>
+        </div>
+
+        <div class="returns-card">
+            <h2>Оформление возврата товара</h2>
+            <p style="color: #64748b; margin-top: -5px; margin-bottom: 25px;">Нажмите на строку с заказом (поставьте галочку), чтобы выбрать его и открыть список деталей:</p>
+
+            <!-- ТАБЛИЦА ВЫБОРА ЗАКАЗОВ -->
+            <table class="returns-table">
+                <thead>
+                    <tr>
+                        <th style="width: 60px; text-align: center;">Выбрать</th>
+                        <th>Номер заказа</th>
+                        <th>Дата создания</th>
+                        <th>Сумма</th>
+                        <th>Доступный статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="returns-row" id="row-AM-785112" onclick="toggleOrderRow('AM-785112')" style="cursor: pointer;">
+                        <td style="text-align: center;">
+                            <span class="custom-checkbox-wrapper" id="check-indicator-AM-785112"></span>
+                        </td>
+                        <td><strong>№ AM-785112</strong></td>
+                        <td>15.09.2026</td>
+                        <td><strong>3 200 ₽</strong></td>
+                        <td style="color: #16a34a; font-weight: 600;">Выкуплен (Продажа)</td>
+                    </tr>
+                    <tr class="returns-row" id="row-AM-764301" onclick="toggleOrderRow('AM-764301')" style="cursor: pointer;">
+                        <td style="text-align: center;">
+                            <span class="custom-checkbox-wrapper" id="check-indicator-AM-764301"></span>
+                        </td>
+                        <td><strong>№ AM-764301</strong></td>
+                        <td>01.09.2026</td>
+                        <td><strong>14 500 ₽</strong></td>
+                        <td style="color: #16a34a; font-weight: 600;">Выкуплен (Продажа)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- БЛОК ДЕТАЛЕЙ ТОВАРОВ (Появляется ниже вашей таблицы при выборе заказа) -->
+            <div id="parts-selection-block" class="parts-select-box" style="display: none; margin-top: 25px;">
+                <h4 style="margin-top: 0; margin-bottom: 10px; color: #ea580c;" id="parts-block-title">Выберите позиции внутри заказа для возврата:</h4>
+                
+                <!-- Сюда JS подгрузит артикулы с галочками -->
+                <div id="parts-list-container"></div>
+
+                <!-- Строка суммирования стоимости -->
+                <div class="return-summary-box" style="margin-top: 15px; display: flex; justify-content: space-between; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                    <span style="font-weight: 500; color: #64748b;">Итого к возврату:</span>
+                    <span class="return-total-price" id="return-total-amount" style="color: #ea580c; font-size: 18px; font-weight: bold;">0 ₽</span>
+                </div>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <label style="font-weight: 600; display: block; margin-bottom: 8px;">Укажите причину возврата товаров:</label>
+                    <select id="return-reason" class="custom-reason-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff;">
+                        <option>Ошибочный подбор / Не подошла деталь</option>
+                        <option>Заводской брак (требуется акт дефектовки)</option>
+                        <option>Пересортица (пришла другая деталь)</option>
+                        <option>Отказ клиента</option>
+                    </select>
+                </div>
+
+                <!-- КНОПКА ОФОРМЛЕНИЯ -->
+                <button id="submit-return-btn" onclick="submitReturnForm()" style="margin-top: 20px; width: 100%; background: #ea580c; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                    Оформить возврат
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="returns.js"></script>
+</body>
+</html>
